@@ -6,145 +6,142 @@
 <title>Колония — За Барьером</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IM+Fell+English:ital@0;1&display=swap');
+:root{--gold:#D4A830;--gold2:#A07818;--dark:#0A0806;--panel:rgba(10,7,3,0.93);--border:#6B4E1A;--text:#C8B490;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);font-family:'IM Fell English',Georgia,serif;overflow:hidden;height:100vh;width:100vw;touch-action:none;}
 
-:root {
-  --gold:   #D4A830;
-  --gold2:  #A07818;
-  --dark:   #0A0806;
-  --panel:  rgba(10,7,3,0.92);
-  --border: #6B4E1A;
-  --text:   #C8B490;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--dark);
-  font-family: 'IM Fell English', Georgia, serif;
-  overflow: hidden; height: 100vh; width: 100vw;
-  cursor: crosshair;
-}
+/* ── TITLE ── */
+#title{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 35%,#1E1005 0%,#050301 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;}
+#title::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;}
+.t-rune{font-size:11px;letter-spacing:.4em;color:#3A2508;font-family:'Cinzel',serif;margin-bottom:24px;}
+#title h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(32px,8vw,60px);color:var(--gold);letter-spacing:.2em;text-shadow:0 0 60px rgba(200,140,20,.5);margin-bottom:8px;line-height:1;}
+.t-sub{font-style:italic;font-size:clamp(12px,2.5vw,18px);color:#7A5820;letter-spacing:.15em;margin-bottom:40px;}
+.t-div{width:240px;height:1px;background:linear-gradient(90deg,transparent,rgba(180,110,20,.6),transparent);margin:0 auto 30px;position:relative;}
+.t-div::before,.t-div::after{content:'◆';position:absolute;top:50%;transform:translateY(-50%);color:#6A4010;font-size:8px;}
+.t-div::before{left:50px;}.t-div::after{right:50px;}
+.t-lore{font-style:italic;font-size:clamp(11px,2vw,14px);color:#5A4218;max-width:340px;text-align:center;line-height:1.9;margin-bottom:44px;}
+.btn{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#C8A040;background:transparent;border:1px solid #6B4E1A;border-radius:2px;padding:11px 30px;cursor:pointer;transition:all .2s;box-shadow:0 0 20px rgba(180,120,20,.15);}
+.btn:hover,.btn:active{color:#F0D060;border-color:#B08030;background:rgba(180,120,20,.08);box-shadow:0 0 30px rgba(200,150,30,.3);}
+.btn-sm{font-size:10px;padding:6px 14px;}
 
-/* ── TITLE ──────────────────────────────────────────────── */
-#title {
-  position: fixed; inset: 0;
-  background: radial-gradient(ellipse at 50% 35%, #1E1005 0%, #050301 100%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 100;
-}
-#title::before {
-  content: ''; position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
-  pointer-events: none;
-}
-.t-rune { font-size:12px; letter-spacing:.5em; color:#3A2508; font-family:'Cinzel',serif; margin-bottom:28px; }
-#title h1 {
-  font-family:'Cinzel',serif; font-weight:900;
-  font-size:clamp(36px,7vw,64px); color:var(--gold);
-  letter-spacing:.2em;
-  text-shadow:0 0 60px rgba(200,140,20,.5),0 0 120px rgba(200,140,20,.2);
-  margin-bottom:8px; line-height:1;
-}
-.t-sub { font-style:italic; font-size:clamp(13px,2.2vw,19px); color:#7A5820; letter-spacing:.15em; margin-bottom:48px; }
-.t-div {
-  width:280px; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(180,110,20,.6),transparent);
-  margin:0 auto 36px; position:relative;
-}
-.t-div::before,.t-div::after { content:'◆'; position:absolute; top:50%; transform:translateY(-50%); color:#6A4010; font-size:8px; }
-.t-div::before { left:60px; } .t-div::after { right:60px; }
-.t-lore { font-style:italic; font-size:clamp(12px,1.6vw,15px); color:#5A4218; max-width:400px; text-align:center; line-height:1.9; margin-bottom:52px; }
-.btn {
-  font-family:'Cinzel',serif; font-size:14px; letter-spacing:.16em; text-transform:uppercase;
-  color:#C8A040; background:transparent; border:1px solid #6B4E1A; border-radius:2px;
-  padding:11px 34px; cursor:pointer; transition:all .22s;
-  box-shadow:0 0 20px rgba(180,120,20,.15),inset 0 1px 0 rgba(255,200,80,.04);
-}
-.btn:hover { color:#F0D060; border-color:#B08030; box-shadow:0 0 35px rgba(200,150,30,.35); background:rgba(180,120,20,.07); }
-.btn-sm { font-size:11px; padding:7px 18px; }
+/* ── GAME ── */
+#game{position:fixed;inset:0;display:none;}
+#c{display:block;}
 
-/* ── GAME ───────────────────────────────────────────────── */
-#game { position:fixed; inset:0; display:none; }
-#c { display:block; }
+/* ── HUD ── */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:8px 12px;pointer-events:none;z-index:20;}
+.hpanel{background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:5px 10px;box-shadow:0 2px 12px rgba(0,0,0,.7);}
+#hud-loc-label{font-family:'Cinzel',serif;font-size:8px;color:var(--gold2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1px;}
+#hud-loc-name{font-family:'IM Fell English',serif;font-size:13px;color:var(--gold);font-style:italic;}
+.hq{text-align:right;max-width:200px;}
+.hq-l{font-family:'Cinzel',serif;font-size:8px;color:#6A4A18;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px;}
+#hud-qt{font-size:11px;color:#C4A060;font-style:italic;line-height:1.3;}
+#hud-qt.done{color:#70B870;}
 
-/* ── HUD ────────────────────────────────────────────────── */
-#hud {
-  position:fixed; top:0; left:0; right:0;
-  display:flex; justify-content:space-between; align-items:flex-start;
-  padding:10px 14px; pointer-events:none; z-index:20;
-}
-.hpanel {
-  background:var(--panel); border:1px solid var(--border); border-radius:3px;
-  padding:7px 13px; box-shadow:0 2px 16px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,200,60,.05);
-}
-#hud-loc-label { font-family:'Cinzel',serif; font-size:9px; color:var(--gold2); letter-spacing:.14em; text-transform:uppercase; margin-bottom:2px; }
-#hud-loc-name  { font-family:'IM Fell English',serif; font-size:14px; color:var(--gold); font-style:italic; text-shadow:0 0 8px rgba(200,150,30,.4); }
-.hq { text-align:right; max-width:250px; }
-.hq-l { font-family:'Cinzel',serif; font-size:9px; color:#6A4A18; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
-#hud-qt { font-size:12px; color:#C4A060; font-style:italic; line-height:1.4; }
-#hud-qt.done { color:#70B870; }
+/* ── MINIMAP ── */
+#mm-wrap{position:fixed;bottom:160px;right:10px;background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:5px;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.7);}
+#mm-title{font-family:'Cinzel',serif;font-size:7px;color:#6A4A18;letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:3px;}
+#minimap{display:block;}
 
-/* ── MINIMAP ─────────────────────────────────────────────── */
-#mm-wrap {
-  position:fixed; bottom:50px; right:14px;
-  background:var(--panel); border:1px solid var(--border); border-radius:3px;
-  padding:6px; z-index:20; box-shadow:0 2px 16px rgba(0,0,0,.7);
-}
-#mm-title { font-family:'Cinzel',serif; font-size:8px; color:#6A4A18; letter-spacing:.1em; text-transform:uppercase; text-align:center; margin-bottom:4px; }
-#minimap { display:block; }
+/* ── NOTIF ── */
+#notif{display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid #607A28;border-radius:3px;padding:6px 14px;font-style:italic;font-size:12px;color:#A0C870;z-index:40;pointer-events:none;white-space:nowrap;box-shadow:0 0 12px rgba(90,150,20,.3);}
 
-/* ── NOTIF ──────────────────────────────────────────────── */
-#notif {
-  display:none; position:fixed; top:62px; left:50%; transform:translateX(-50%);
-  background:var(--panel); border:1px solid #607A28; border-radius:3px;
-  padding:7px 18px; font-style:italic; font-size:13px; color:#A0C870;
-  z-index:40; pointer-events:none; white-space:nowrap;
-  box-shadow:0 0 14px rgba(90,150,20,.3);
-}
-#notif.w { border-color:#7A5020; color:#D4A060; }
+/* ── DIALOGUE ── */
+#dlg-wrap{display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;padding:0 10px 10px;}
+#dlg-box{background:linear-gradient(180deg,rgba(8,6,2,.98) 0%,rgba(16,11,4,.99) 100%);border:1px solid var(--border);border-top:2px solid #9B6E2A;border-radius:5px 5px 3px 3px;padding:12px 14px 10px;box-shadow:0 -6px 30px rgba(0,0,0,.85);position:relative;max-width:700px;margin:0 auto;}
+#dlg-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,150,50,.5),transparent);}
+#dlg-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+#dlg-portrait{width:48px;height:48px;flex-shrink:0;border:1px solid var(--border);border-radius:3px;background:rgba(20,14,4,.8);overflow:hidden;}
+#dlg-portrait canvas{display:block;}
+#dlg-nname{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#E8C050;margin-bottom:2px;}
+#dlg-nrole{font-size:10px;color:#7A5820;font-style:italic;}
+#dlg-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px;min-height:36px;border-left:2px solid rgba(120,80,20,.3);padding-left:10px;}
+#dlg-opts{display:flex;flex-direction:column;gap:4px;}
+.dopt{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:#A08850;background:transparent;border:none;border-left:2px solid #4A3410;padding:6px 10px;cursor:pointer;text-align:left;transition:all .15s;border-radius:0 3px 3px 0;-webkit-tap-highlight-color:transparent;}
+.dopt:hover,.dopt:active{color:#F0D070;border-left-color:#C09030;background:rgba(180,120,20,.08);}
+.dopt::before{content:'▸  ';color:#5A3A10;font-style:normal;font-size:10px;}
+/* Кнопка закрытия для мобилки */
+#dlg-close{position:absolute;top:8px;right:10px;font-family:'Cinzel',serif;font-size:10px;color:#5A4020;background:transparent;border:1px solid #4A3010;border-radius:2px;padding:3px 8px;cursor:pointer;letter-spacing:.06em;-webkit-tap-highlight-color:transparent;}
+#dlg-close:active{color:#D4A040;border-color:#9A6020;}
 
-/* ── DIALOGUE ────────────────────────────────────────────── */
-#dlg-wrap { display:none; position:fixed; bottom:0; left:0; right:0; z-index:30; padding:0 14px 14px; }
-#dlg-box {
-  background:linear-gradient(180deg,rgba(8,6,2,.98) 0%,rgba(16,11,4,.99) 100%);
-  border:1px solid var(--border); border-top:2px solid #9B6E2A;
-  border-radius:5px 5px 3px 3px; padding:16px 20px 14px;
-  box-shadow:0 -6px 40px rgba(0,0,0,.85),0 0 24px rgba(160,100,20,.12);
-  position:relative; max-width:760px; margin:0 auto;
-}
-#dlg-box::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,150,50,.5),transparent);
-}
-#dlg-hdr { display:flex; align-items:flex-start; gap:14px; margin-bottom:10px; }
-#dlg-portrait {
-  width:52px; height:52px; flex-shrink:0;
-  border:1px solid var(--border); border-radius:3px;
-  background:rgba(20,14,4,.8); overflow:hidden;
-}
-#dlg-portrait canvas { display:block; }
-#dlg-nname { font-family:'Cinzel',serif; font-size:15px; font-weight:700; color:#E8C050; letter-spacing:.04em; text-shadow:0 0 12px rgba(220,170,40,.35); margin-bottom:2px; }
-#dlg-nrole { font-size:11px; color:#7A5820; font-style:italic; }
-#dlg-text  { font-size:14px; color:var(--text); line-height:1.65; margin-bottom:14px; min-height:42px; border-left:2px solid rgba(120,80,20,.3); padding-left:12px; }
-#dlg-opts  { display:flex; flex-direction:column; gap:5px; }
-.dopt {
-  font-family:'IM Fell English',serif; font-style:italic; font-size:13px;
-  color:#A08850; background:transparent; border:none; border-left:2px solid #4A3410;
-  padding:5px 12px; cursor:pointer; text-align:left; transition:all .15s; border-radius:0 3px 3px 0;
-}
-.dopt:hover { color:#F0D070; border-left-color:#C09030; background:rgba(180,120,20,.08); padding-left:16px; }
-.dopt::before { content:'▸  '; color:#5A3A10; font-style:normal; font-size:10px; }
-.dopt:hover::before { color:#D0A030; }
-#dlg-esc { position:absolute; top:10px; right:14px; font-size:10px; color:#4A3218; font-style:italic; }
+/* ── BACK BTN ── */
+#back-btn{position:fixed;top:8px;right:10px;pointer-events:all;z-index:30;}
 
-/* ── BACK / CTRL ─────────────────────────────────────────── */
-#back-btn { position:fixed; bottom:12px; right:14px; pointer-events:all; z-index:30; }
-#ctrl { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); font-style:italic; font-size:10px; color:rgba(160,130,65,.42); pointer-events:none; z-index:20; white-space:nowrap; }
+/* ── CTRL HINT (keyboard only) ── */
+#ctrl{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);font-style:italic;font-size:9px;color:rgba(160,130,65,.35);pointer-events:none;z-index:20;white-space:nowrap;}
+
+/* ════════════════════════════════
+   ВИРТУАЛЬНЫЙ ДЖОЙСТИК
+   ════════════════════════════════ */
+#joy-zone{
+  display:none; /* показывается только на touch */
+  position:fixed;bottom:24px;left:20px;
+  width:120px;height:120px;
+  z-index:25;touch-action:none;user-select:none;
+  -webkit-user-select:none;
+}
+#joy-base{
+  position:absolute;inset:0;border-radius:50%;
+  background:rgba(8,5,2,.6);
+  border:2px solid rgba(160,110,30,.3);
+  box-shadow:0 0 20px rgba(0,0,0,.6),inset 0 0 16px rgba(0,0,0,.5);
+}
+/* крестик-ориентир внутри */
+#joy-base::before,#joy-base::after{
+  content:'';position:absolute;background:rgba(180,130,40,.1);border-radius:1px;
+}
+#joy-base::before{left:50%;top:14%;width:1px;height:72%;transform:translateX(-50%);}
+#joy-base::after {top:50%;left:14%;height:1px;width:72%;transform:translateY(-50%);}
+/* внешние стрелки-подсказки */
+#joy-arrows{position:absolute;inset:0;pointer-events:none;}
+#joy-arrows span{position:absolute;font-size:9px;color:rgba(180,130,40,.2);line-height:1;}
+#joy-arrows .ja-up   {top:4px;  left:50%;transform:translateX(-50%);}
+#joy-arrows .ja-down {bottom:4px;left:50%;transform:translateX(-50%);}
+#joy-arrows .ja-left {left:5px; top:50%;transform:translateY(-50%);}
+#joy-arrows .ja-right{right:5px;top:50%;transform:translateY(-50%);}
+
+#joy-knob{
+  position:absolute;
+  width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle at 38% 33%,rgba(230,175,65,.92),rgba(100,62,10,.88));
+  border:1.5px solid rgba(215,165,45,.55);
+  box-shadow:0 3px 12px rgba(0,0,0,.75),0 0 10px rgba(180,120,20,.2);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;will-change:transform;
+  transition:box-shadow .08s;
+}
+#joy-knob.active{box-shadow:0 3px 16px rgba(0,0,0,.8),0 0 16px rgba(200,140,30,.35);}
+#joy-knob::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,rgba(255,220,100,.22),transparent 58%);}
+
+/* ── КНОПКА ДЕЙСТВИЯ (E) ── */
+#btn-e{
+  display:none;
+  position:fixed;bottom:30px;right:24px;
+  width:68px;height:68px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,rgba(30,20,6,.96),rgba(8,5,2,.98));
+  border:2px solid rgba(160,110,30,.45);
+  box-shadow:0 0 16px rgba(0,0,0,.7),0 0 8px rgba(180,120,20,.12);
+  font-family:'Cinzel',serif;color:rgba(210,160,40,.9);
+  cursor:pointer;z-index:25;touch-action:none;user-select:none;
+  -webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  transition:all .08s;
+}
+#btn-e .be-key{font-size:20px;font-weight:900;line-height:1;}
+#btn-e .be-lbl{font-size:7px;color:rgba(160,120,40,.65);letter-spacing:.08em;}
+#btn-e:active,#btn-e.lit{
+  background:radial-gradient(circle at 40% 35%,rgba(55,38,8,.96),rgba(18,11,3,.98));
+  border-color:rgba(220,170,50,.8);
+  box-shadow:0 0 22px rgba(200,140,20,.45);
+  color:#FFE060;
+}
 </style>
 </head>
 <body>
 
-<!-- TITLE -->
+<!-- ══════ TITLE ══════ -->
 <div id="title">
-  <div class="t-rune">✦ Магический барьер — Колония — Заключённые ✦</div>
+  <div class="t-rune">✦ Магический барьер · Колония · Заключённые ✦</div>
   <h1>КОЛОНИЯ</h1>
   <div class="t-sub">— За Барьером —</div>
   <div class="t-div"></div>
@@ -157,7 +154,7 @@ body {
   <button class="btn" id="start-btn">⚔ Войти в колонию</button>
 </div>
 
-<!-- GAME -->
+<!-- ══════ GAME ══════ -->
 <div id="game">
   <canvas id="c"></canvas>
 
@@ -174,16 +171,16 @@ body {
 
   <div id="mm-wrap">
     <div id="mm-title">Карта колонии</div>
-    <canvas id="minimap" width="130" height="98"></canvas>
+    <canvas id="minimap" width="110" height="83"></canvas>
   </div>
 
   <div id="notif"></div>
 
   <div id="dlg-wrap">
     <div id="dlg-box">
-      <div id="dlg-esc">Esc — закрыть</div>
+      <button id="dlg-close" onclick="closeDlg()">✕ закрыть</button>
       <div id="dlg-hdr">
-        <div id="dlg-portrait"><canvas id="portrait-c" width="52" height="52"></canvas></div>
+        <div id="dlg-portrait"><canvas id="portrait-c" width="48" height="48"></canvas></div>
         <div><div id="dlg-nname"></div><div id="dlg-nrole"></div></div>
       </div>
       <div id="dlg-text"></div>
@@ -192,285 +189,592 @@ body {
   </div>
 
   <button class="btn btn-sm" id="back-btn" onclick="backToTitle()">◂ Выйти</button>
-  <div id="ctrl">WASD / ↑↓←→ — движение &nbsp;|&nbsp; E — разговор &nbsp;|&nbsp; Esc — закрыть диалог</div>
+  <div id="ctrl">WASD / ↑↓←→ — движение &nbsp;|&nbsp; E — разговор</div>
+
+  <!-- Джойстик -->
+  <div id="joy-zone">
+    <div id="joy-base">
+      <div id="joy-arrows">
+        <span class="ja-up">▲</span>
+        <span class="ja-down">▼</span>
+        <span class="ja-left">◀</span>
+        <span class="ja-right">▶</span>
+      </div>
+    </div>
+    <div id="joy-knob"></div>
+  </div>
+
+  <!-- Кнопка действия -->
+  <div id="btn-e">
+    <span class="be-key">E</span>
+    <span class="be-lbl">действие</span>
+  </div>
 </div>
 
-<script src="data.js"></script>
-<script src="renderer.js"></script>
 <script>
+'use strict';
 // ═══════════════════════════════════════════════════════════
-//  engine — Игровой движок
+//  DATA
 // ═══════════════════════════════════════════════════════════
-const VW = 800, VH = 600;
+const WORLD = { W:2400, H:1800, TILE:32, PLAYER_SPEED:170, PLAYER_R:9, INTERACT_R:60 };
 
-const canvas = document.getElementById('c');
-const ctx    = canvas.getContext('2d');
-const mmC    = document.getElementById('minimap');
-const mmCtx  = mmC.getContext('2d');
+const ZONES = [
+  {name:'Старый лагерь',    x:100, y:100, w:620, h:480, theme:'old'},
+  {name:'Новый лагерь',     x:1650,y:120, w:620, h:480, theme:'new'},
+  {name:'Сектанты',         x:1000,y:1250,w:500, h:440, theme:'cult'},
+  {name:'Шахтёрский посёлок',x:1500,y:750, w:480, h:380, theme:'mine'},
+  {name:'Руины',            x:200, y:1100,w:400, h:380, theme:'ruins'},
+];
 
-function resize() {
-  const r = Math.min(window.innerWidth/VW, window.innerHeight/VH);
-  canvas.style.width  = (VW*r)+'px';
-  canvas.style.height = (VH*r)+'px';
-  canvas.width = VW; canvas.height = VH;
-}
-window.addEventListener('resize', resize);
+const BUILDINGS = [
+  // Старый лагерь
+  {x:130,y:130,w:140,h:100,type:'hall', label:'Главный зал',     theme:'old'},
+  {x:300,y:130,w:90, h:75, type:'hut',  label:'Казармы',         theme:'old'},
+  {x:420,y:135,w:90, h:75, type:'hut',  label:'Казармы №2',      theme:'old'},
+  {x:545,y:140,w:80, h:65, type:'hut',  label:'Склад',           theme:'old'},
+  {x:135,y:270,w:95, h:75, type:'forge',label:'Кузница',         theme:'old'},
+  {x:265,y:265,w:85, h:70, type:'hut',  label:'Таверна',         theme:'old'},
+  {x:390,y:260,w:80, h:65, type:'hut',  label:'Торговец',        theme:'old'},
+  {x:515,y:255,w:75, h:65, type:'hut',  label:'Стража',          theme:'old'},
+  {x:640,y:130,w:50, h:120,type:'tower',label:'Сторожевая башня',theme:'old'},
+  {x:140,y:390,w:80, h:65, type:'hut',  label:'Жилой барак',     theme:'old'},
+  {x:255,y:385,w:85, h:65, type:'hut',  label:'',                theme:'old'},
+  {x:375,y:380,w:75, h:65, type:'hut',  label:'',                theme:'old'},
+  {x:475,y:380,w:75, h:65, type:'hut',  label:'',                theme:'old'},
+  // Новый лагерь
+  {x:1670,y:140,w:130,h:95, type:'hall', label:'Совет лагеря',   theme:'new'},
+  {x:1830,y:140,w:110,h:85, type:'hut',  label:'Мастерская',     theme:'new'},
+  {x:1970,y:145,w:100,h:80, type:'hut',  label:'Лаборатория',    theme:'new'},
+  {x:2090,y:145,w:80, h:70, type:'hut',  label:'Арсенал',        theme:'new'},
+  {x:1680,y:275,w:100,h:80, type:'hut',  label:'Общий дом',      theme:'new'},
+  {x:1810,y:270,w:90, h:75, type:'hut',  label:'Медпункт',       theme:'new'},
+  {x:1930,y:265,w:85, h:70, type:'forge',label:'Кузница',        theme:'new'},
+  {x:2055,y:260,w:80, h:70, type:'hut',  label:'Склад руды',     theme:'new'},
+  {x:2180,y:130,w:55, h:130,type:'tower',label:'Башня дозора',   theme:'new'},
+  {x:1660,y:385,w:85, h:65, type:'hut',  label:'',               theme:'new'},
+  {x:1775,y:380,w:85, h:65, type:'hut',  label:'',               theme:'new'},
+  {x:1895,y:375,w:85, h:65, type:'hut',  label:'Катапульта (стр)',theme:'new'},
+  // Сектанты
+  {x:1100,y:1280,w:80, h:130,type:'altar',label:'Алтарь Дремлющего',theme:'cult'},
+  {x:1220,y:1290,w:90, h:90, type:'hut',  label:'Покои жрецов',  theme:'cult'},
+  {x:1350,y:1285,w:75, h:80, type:'hut',  label:'Обитель',       theme:'cult'},
+  {x:1460,y:1280,w:70, h:80, type:'hut',  label:'',              theme:'cult'},
+  {x:1105,y:1455,w:80, h:75, type:'hut',  label:'Хранилище',     theme:'cult'},
+  {x:1220,y:1440,w:90, h:80, type:'hut',  label:'',              theme:'cult'},
+  {x:1350,y:1440,w:80, h:70, type:'hut',  label:'',              theme:'cult'},
+  // Шахта
+  {x:1520,y:770, w:120,h:90, type:'mine', label:'Главная шахта', theme:'mine'},
+  {x:1670,y:775, w:85, h:75, type:'hut',  label:'Контора',       theme:'mine'},
+  {x:1785,y:770, w:80, h:75, type:'hut',  label:'Жильё шахтёров',theme:'mine'},
+  {x:1895,y:775, w:75, h:70, type:'hut',  label:'',              theme:'mine'},
+  {x:1525,y:895, w:85, h:70, type:'forge',label:'Обработка руды',theme:'mine'},
+  {x:1645,y:890, w:80, h:70, type:'hut',  label:'',              theme:'mine'},
+  {x:1760,y:885, w:80, h:65, type:'hut',  label:'',              theme:'mine'},
+  // Руины
+  {x:230, y:1130,w:100,h:80, type:'ruin', label:'Руины крепости',theme:'ruins'},
+  {x:370, y:1125,w:85, h:75, type:'ruin', label:'',              theme:'ruins'},
+  {x:480, y:1120,w:70, h:70, type:'ruin', label:'',              theme:'ruins'},
+  {x:240, y:1250,w:90, h:75, type:'ruin', label:'Подземный вход',theme:'ruins'},
+  {x:370, y:1245,w:80, h:70, type:'ruin', label:'',              theme:'ruins'},
+  {x:250, y:1370,w:80, h:65, type:'ruin', label:'',              theme:'ruins'},
+  // Башни
+  {x:830, y:390, w:48, h:48, type:'tower',label:'Башня стражи',  theme:'neutral'},
+  {x:1190,y:680, w:44, h:44, type:'tower',label:'Пост №2',       theme:'neutral'},
+];
 
-// ── STATE ──────────────────────────────────────────────────
-const G = {
-  running: false, t: 0,
-  questState: 'none',   // none | active | found | done
-  cam: {x:0,y:0},
-  player: {x:600,y:530,facing:'down',moving:false},
-  keys: {},
-  dlgOpen: false, dlgNPC: null,
-  lastTime: 0, notifTimer: null,
-  visitedZones: new Set(),
+const NPC_DATA = [
+  {id:'captain',  name:'Капитан Рагнар',  x:310, y:295, role:'warrior', bodyColor:'#8B4513',cloakColor:'#6B3010',skinColor:'#D4A070',hairColor:'#2a1800',armorColor:'#8B7355',
+   dialogues:{
+    default:{text:'Значит, ты новенький? Барьер больше не выпустит тебя. Добро пожаловать в колонию.',opts:[{l:'Есть ли для меня работа?',go:'quest_offer'},{l:'Что за лагерь?',go:'why_camp'},{l:'Пока.',go:null}]},
+    why_camp:{text:'Старый лагерь — единственное место с порядком. Жёстким, но порядком. Снаружи грабят и убивают.',opts:[{l:'Понятно. Есть работа?',go:'quest_offer'},{l:'Уйду сам.',go:null}]},
+    quest_offer:{text:'Один из наших — Кривой Торс — пропал. Видели его у Башни стражи на востоке. Найди его, скажи чтоб возвращался.',opts:[{l:'Хорошо, найду.',go:null,act:'ACCEPT'},{l:'Не моя забота.',go:null}]},
+    quest_active:{text:'Торс ещё не вернулся? Башня стражи — к востоку, за дорогой.',opts:[{l:'Уже иду.',go:null}]},
+    quest_done:{text:'Торс вернулся. Хорошая работа. Теперь ты под защитой Старого лагеря.',opts:[{l:'Рад помочь.',go:'after_quest'},{l:'Спасибо.',go:null}]},
+    after_quest:{text:'Сходи к торговцу — у него есть припасы. И обходи руины на юго-западе стороной.',opts:[{l:'Понял.',go:null}]},
+   }},
+  {id:'blacksmith',name:'Кузнец Ганс',   x:185, y:310, role:'worker',  bodyColor:'#5C4033',cloakColor:'#3C2820',skinColor:'#C89060',hairColor:'#1a0a00',armorColor:'#607060',
+   dialogues:{
+    default:{text:'Не мешай работать! Хотя, если есть руда — могу выковать что-нибудь полезное. Руда идёт только из шахты на востоке.',opts:[{l:'Расскажи про шахту.',go:'mine_info'},{l:'Ладно, уйду.',go:null}]},
+    mine_info:{text:'Там работают все. Каждый заключённый обязан сдавать руду. Это договор с королём. Без руды — нет еды.',opts:[{l:'Понятно.',go:null}]},
+   }},
+  {id:'merchant', name:'Торговец Кемп',  x:435, y:295, role:'merchant',bodyColor:'#704820',cloakColor:'#503010',skinColor:'#D8B080',hairColor:'#3a2010',armorColor:'#907050',
+   dialogues:{
+    default:{text:'Есть еда, верёвки, факелы. Дорого, но в колонии всё дорого.',opts:[{l:'Что слышно в лагере?',go:'rumors'},{l:'Просто смотрю.',go:null}]},
+    rumors:{text:'Новый лагерь строит какую-то машину. Безумцы. А сектанты ночами воют у алтаря. Мне это не нравится.',opts:[{l:'Интересно.',go:null}]},
+   }},
+  {id:'tors',     name:'Кривой Торс',    x:855, y:435, role:'thug',    bodyColor:'#6B5040',cloakColor:'#4B3830',skinColor:'#C0906A',hairColor:'#2a1810',armorColor:'#705848',
+   dialogues:{
+    default:{text:'Отвали. Этот камень у башни — он светится в полнолуние. Никогда такого не видел.',opts:[{l:'Рагнар просит вернуться.',go:'return'},{l:'Покажи камень.',go:'stone'},{l:'Удачи.',go:null}]},
+    stone:{text:'Видишь синий прожилок? Я уверен — это связано с барьером. Может, если найти все такие камни...',opts:[{l:'Рагнар тебя ждёт.',go:'return'},{l:'Интересно. Пока.',go:null}]},
+    return:{text:'...Ладно. Скажи ему — иду. Только запишу, где нашёл камень.',opts:[{l:'Передам. Будь осторожен.',go:null,act:'COMPLETE'}]},
+    quest_done:{text:'Я уже сказал Рагнару. Займись своими делами.',opts:[{l:'Хорошо.',go:null}]},
+   }},
+  {id:'guard',    name:'Страж Брут',     x:858, y:408, role:'warrior', bodyColor:'#4A4A3A',cloakColor:'#3A3A2A',skinColor:'#C09070',hairColor:'#1a1008',armorColor:'#5A5A4A',
+   dialogues:{
+    default:{text:'Дальше без пропуска нельзя. Поворачивай.',opts:[{l:'Я ищу Кривого Торса.',go:'tors_info'},{l:'Хорошо, ухожу.',go:null}]},
+    tors_info:{text:'Торс? Видел час назад. Крутился у башни, что-то рассматривал. Странный тип.',opts:[{l:'Спасибо.',go:null}]},
+   }},
+  {id:'engineer', name:'Инженер Волка',  x:1820,y:310, role:'worker',  bodyColor:'#1E5E1E',cloakColor:'#124412',skinColor:'#C09868',hairColor:'#302010',armorColor:'#4A7A4A',
+   dialogues:{
+    default:{text:'Мы строим катапульту. Концентрированная руда может ослабить барьер. Нас считают безумцами — но у нас есть план.',opts:[{l:'Расскажи подробнее.',go:'plan'},{l:'Звучит опасно.',go:'risky'},{l:'Удачи.',go:null}]},
+    plan:{text:'Нужна рудная гора из Свободной шахты. Маги говорят, что руда ослабляет магию барьера изнутри.',opts:[{l:'Интересно.',go:null}]},
+    risky:{text:'Всё опасно в этой колонии. Бездействие — верная смерть. Лучше рискнуть.',opts:[{l:'Не могу не согласиться.',go:null}]},
+   }},
+  {id:'mage',     name:'Маг Сатурас',    x:2040,y:300, role:'mage',    bodyColor:'#1A3060',cloakColor:'#102040',skinColor:'#B8A090',hairColor:'#e0e8ff',armorColor:'#2A4080',
+   dialogues:{
+    default:{text:'Барьер создали с помощью особых магических камней. Если найти их все — можно разрушить барьер изнутри.',opts:[{l:'Как найти камни?',go:'stones'},{l:'Почему ещё не разрушили?',go:'why'},{l:'Понятно.',go:null}]},
+    stones:{text:'Камни разбросаны по всей колонии. Один из них светится синим — ищи у нейтральных территорий.',opts:[{l:'Буду иметь в виду.',go:null}]},
+    why:{text:'Нужны и маги воды, и маги огня. Маги огня работают на Старый лагерь. Союза пока нет.',opts:[{l:'Понятно.',go:null}]},
+   }},
+  {id:'shaman',   name:'Старец Гааль',   x:1150,y:1370,role:'shaman',  bodyColor:'#4A0E78',cloakColor:'#30085A',skinColor:'#A89078',hairColor:'#e8e0d0',armorColor:'#6A1A9A',
+   dialogues:{
+    default:{text:'Ты чувствуешь пульс под ногами? Это Дремлющий. Мы слышим его каждую ночь.',opts:[{l:'Что такое Дремлющий?',go:'lore'},{l:'Вы опасны.',go:'danger'},{l:'Уйду.',go:null}]},
+    lore:{text:'Маги создали барьер, не зная что разбудили его. Когда он поднимется — цепи барьера лопнут. Освобождение или конец.',opts:[{l:'И что будет потом?',go:'after'},{l:'Безумие.',go:'crazy'}]},
+    after:{text:'Мы принимаем оба варианта. Рабство точно хуже.',opts:[{l:'Смелая позиция.',go:null}]},
+    crazy:{text:'Безумие — три года копать руду для короля, который тебя уже забыл.',opts:[{l:'Тут не поспоришь.',go:null}]},
+    danger:{text:'Мы никому не угрожаем. Мы просто ждём и молимся.',opts:[{l:'Ладно. Уйду.',go:null}]},
+   }},
+  {id:'miner',    name:'Бригадир Хорт',  x:1680,y:875, role:'worker',  bodyColor:'#4A3828',cloakColor:'#3A2818',skinColor:'#B88060',hairColor:'#120800',armorColor:'#6A5038',
+   dialogues:{
+    default:{text:'Шахта работает круглосуточно. Мы нейтральны — это единственное, что нас защищает.',opts:[{l:'Как тут обстановка?',go:'info'},{l:'Нужна работа?',go:'job'},{l:'Понятно.',go:null}]},
+    info:{text:'Напряжённо. Старый лагерь хочет контроля над шахтой. Новый тоже. А мы просто копаем.',opts:[{l:'Трудная ситуация.',go:null}]},
+    job:{text:'Всегда. Платим едой и кровом. Если устраивает — добро пожаловать.',opts:[{l:'Подумаю.',go:null}]},
+   }},
+  {id:'hermit',   name:'Отшельник Ксар', x:400, y:1290,role:'mage',    bodyColor:'#2A2A1A',cloakColor:'#1A1A0E',skinColor:'#A09878',hairColor:'#d0c8a0',armorColor:'#3A3A28',
+   dialogues:{
+    default:{text:'Эти руины — часть старой крепости. До барьера здесь было поселение. Я изучаю, что осталось.',opts:[{l:'Что ты нашёл?',go:'found'},{l:'Опасно тут?',go:'danger'},{l:'Уйду.',go:null}]},
+    found:{text:'Барьер — не тюрьма. Это печать. Кто-то давно запечатал здесь нечто. Наш король использовал старую магию, даже не зная об этом.',opts:[{l:'Это важно...',go:null}]},
+    danger:{text:'По ночам слышны звуки из подземного хода. Я туда не хожу. И ты не ходи.',opts:[{l:'Учту. Спасибо.',go:null}]},
+   }},
+];
+
+// ═══════════════════════════════════════════════════════════
+//  RENDERER
+// ═══════════════════════════════════════════════════════════
+const TC = {
+  old:    {wall:'#6B3A14',roof:'#8B4A18',trim:'#A05A28',shadow:'#3a1808'},
+  new:    {wall:'#1A4A1A',roof:'#2A6A2A',trim:'#3A8A3A',shadow:'#082008'},
+  cult:   {wall:'#2E0A50',roof:'#4A1278',trim:'#6A1A9A',shadow:'#180430'},
+  mine:   {wall:'#4A3828',roof:'#5A4830',trim:'#7A5840',shadow:'#201408'},
+  ruins:  {wall:'#3A3028',roof:'#2A2018',trim:'#5A4A38',shadow:'#181008'},
+  neutral:{wall:'#4A4030',roof:'#5A5038',trim:'#7A6848',shadow:'#201808'},
 };
 
-// ── INPUT ──────────────────────────────────────────────────
-window.addEventListener('keydown', e => {
-  G.keys[e.code] = true;
-  if (e.code==='KeyE' && !G.dlgOpen) { tryInteract(); e.preventDefault(); }
-  if (e.code==='Escape' && G.dlgOpen) { closeDlg(); e.preventDefault(); }
-});
-window.addEventListener('keyup', e => G.keys[e.code] = false);
+function mkRng(seed){let s=seed;return()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};}
+function shade(hex,p){const n=parseInt(hex.replace('#',''),16);const r=Math.min(255,((n>>16)&0xff)+p),g=Math.min(255,((n>>8)&0xff)+p),b=Math.min(255,(n&0xff)+p);return`rgb(${r},${g},${b})`;}
 
-// ── COLLISION ─────────────────────────────────────────────
-function collides(nx, ny) {
-  if (nx<28||nx>WORLD.W-28||ny<28||ny>WORLD.H-28) return true;
-  for (const b of BUILDINGS) {
-    const cx = Math.max(b.x+2, Math.min(nx, b.x+b.w-2));
-    const cy = Math.max(b.y+2, Math.min(ny, b.y+b.h-2));
-    if (Math.hypot(nx-cx, ny-cy) < WORLD.PLAYER_R+1) return true;
-  }
-  return false;
-}
+const DECO=(()=>{const rng=mkRng(12345),items=[];
+  for(let i=0;i<180;i++)items.push({type:'rock',x:rng()*WORLD.W,y:rng()*WORLD.H,rx:3+rng()*5,ry:2+rng()*3,a:rng()*Math.PI});
+  for(let i=0;i<220;i++)items.push({type:'tree',x:rng()*WORLD.W,y:rng()*WORLD.H,r:7+rng()*10,v:Math.floor(rng()*3)});
+  for(let i=0;i<60;i++) items.push({type:'bush',x:rng()*WORLD.W,y:rng()*WORLD.H,r:4+rng()*5});
+  return items;})();
 
-// ── ZONE ──────────────────────────────────────────────────
-function getZone(px, py) {
-  for (const z of ZONES) {
-    if (px>=z.x&&px<=z.x+z.w&&py>=z.y&&py<=z.y+z.h) return z.name;
-  }
-  return 'Нейтральная зона';
-}
+function bContains(bx,by){for(const b of BUILDINGS)if(bx>b.x-8&&bx<b.x+b.w+8&&by>b.y-8&&by<b.y+b.h+8)return true;return false;}
 
-// ── HUD ───────────────────────────────────────────────────
-let _lz='', _hudT=0;
-function updateHUD() {
-  const zone = getZone(G.player.x, G.player.y);
-  document.getElementById('hud-loc-name').textContent = zone;
-  if (zone !== _lz) {
-    if (zone!=='Нейтральная зона' && !G.visitedZones.has(zone)) {
-      G.visitedZones.add(zone);
-      notify('Вы вошли в: '+zone);
-    }
-    _lz = zone;
-  }
-  const el = document.getElementById('hud-qt');
-  const map = {
-    none:  ['Нет активных заданий',''],
-    active:['Найди Кривого Торса у Башни стражи',''],
-    found: ['Торс найден — вернись к Рагнару',''],
-    done:  ['✓ Квест завершён','done'],
-  };
-  const [txt,cls] = map[G.questState]||map.none;
-  el.textContent=txt; el.className=cls;
-}
+const ZS={
+  old:  {fill:'rgba(90,40,8,.22)',  border:'rgba(180,90,20,.5)',  lbl:'#C06820'},
+  new:  {fill:'rgba(8,60,8,.22)',   border:'rgba(30,140,40,.5)',  lbl:'#30A840'},
+  cult: {fill:'rgba(50,5,90,.25)',  border:'rgba(120,30,200,.5)', lbl:'#9030D0'},
+  mine: {fill:'rgba(60,40,10,.22)', border:'rgba(140,100,30,.5)', lbl:'#A07030'},
+  ruins:{fill:'rgba(30,25,15,.25)', border:'rgba(90,75,45,.5)',   lbl:'#807050'},
+};
 
-// ── MINIMAP ────────────────────────────────────────────────
-const MM_W=130, MM_H=98;
-const SX=MM_W/WORLD.W, SY=MM_H/WORLD.H;
-const MM_ZONE_CLR = { old:'#5A2808',new:'#0C3A0C',cult:'#280650',mine:'#3A2A10',ruins:'#2A2010' };
-
-function drawMinimap() {
-  mmCtx.fillStyle='#0E0C08'; mmCtx.fillRect(0,0,MM_W,MM_H);
-  for(const z of ZONES){ mmCtx.fillStyle=MM_ZONE_CLR[z.theme]||'#1A1808'; mmCtx.fillRect(z.x*SX,z.y*SY,z.w*SX,z.h*SY); }
-  mmCtx.fillStyle='#6A4A18';
-  for(const b of BUILDINGS) mmCtx.fillRect(b.x*SX,b.y*SY,Math.max(2,b.w*SX),Math.max(2,b.h*SY));
-  // River
-  mmCtx.fillStyle='#1A3050'; mmCtx.fillRect(1180*SX,480*SY,20*SX,(MM_H-480*SY));
-  mmCtx.strokeStyle='rgba(60,120,255,.5)'; mmCtx.lineWidth=1; mmCtx.strokeRect(1,1,MM_W-2,MM_H-2);
-  // NPCs
-  for(const n of NPC_DATA){
-    mmCtx.fillStyle = n.role==='mage'?'#4080FF':n.role==='shaman'?'#A030D0':'#C08830';
-    mmCtx.beginPath(); mmCtx.arc(n.x*SX,n.y*SY,1.5,0,Math.PI*2); mmCtx.fill();
-  }
-  // Player
-  mmCtx.fillStyle='#FFE050'; mmCtx.shadowColor='#FFD700'; mmCtx.shadowBlur=4;
-  mmCtx.beginPath(); mmCtx.arc(G.player.x*SX,G.player.y*SY,3,0,Math.PI*2); mmCtx.fill();
-  mmCtx.shadowBlur=0;
-}
-
-// ── DIALOGUE ──────────────────────────────────────────────
-const ROLES = { warrior:'Воин',mage:'Маг',shaman:'Жрец',worker:'Рабочий',merchant:'Торговец',thug:'Головорез',prisoner:'Заключённый' };
-
-function tryInteract() {
-  let best=null, bd=WORLD.INTERACT_R;
-  for(const n of NPC_DATA){ const d=Math.hypot(G.player.x-n.x,G.player.y-n.y); if(d<bd){best=n;bd=d;} }
-  if(best) openDlg(best);
-}
-
-function getBranch(n) {
-  const s=G.questState;
-  if(n.id==='captain'){ if(s==='active'||s==='found') return n.dialogues.quest_active||n.dialogues.default; if(s==='done') return n.dialogues.quest_done; }
-  if(n.id==='tors' && s==='done') return n.dialogues.quest_done;
-  return n.dialogues.default;
-}
-
-function openDlg(n) {
-  G.dlgOpen=true; G.dlgNPC=n;
-  document.getElementById('dlg-nname').textContent=n.name;
-  document.getElementById('dlg-nrole').textContent=ROLES[n.role]||'Житель колонии';
-  drawPortrait(n);
-  renderBranch(n, getBranch(n));
-  document.getElementById('dlg-wrap').style.display='block';
-}
-
-function drawPortrait(n) {
-  const pc=document.getElementById('portrait-c');
-  const pctx=pc.getContext('2d');
-  pctx.clearRect(0,0,52,52);
-  pctx.fillStyle='rgba(15,10,4,1)'; pctx.fillRect(0,0,52,52);
-  const cfg={...n,scale:1};
-  switch(n.role){
-    case'mage':   drawMage   (pctx,26,36,cfg,'down',false,G.t); break;
-    case'shaman': drawShaman (pctx,26,36,cfg,'down',false,G.t); break;
-    case'warrior':drawWarrior(pctx,26,36,cfg,'down',false,G.t); break;
-    default:      drawHuman  (pctx,26,36,cfg,'down',false,G.t); break;
-  }
-}
-
-function renderBranch(n, b) {
-  document.getElementById('dlg-text').textContent=b.text;
-  const el=document.getElementById('dlg-opts'); el.innerHTML='';
-  for(const o of b.opts){
-    const btn=document.createElement('button');
-    btn.className='dopt'; btn.textContent=o.l;
-    btn.onclick=()=>handleOpt(n,o);
-    el.appendChild(btn);
-  }
-}
-
-function handleOpt(n,o) {
-  if(o.act==='ACCEPT'){ G.questState='active'; updateHUD(); notify('Задание принято: найди Кривого Торса у Башни стражи'); }
-  if(o.act==='COMPLETE'){ G.questState='found'; updateHUD(); notify('✓ Торс найден! Вернись к Рагнару'); }
-  if(o.go && n.dialogues[o.go]){ renderBranch(n,n.dialogues[o.go]); drawPortrait(n); return; }
-  closeDlg();
-}
-
-function closeDlg() {
-  G.dlgOpen=false; G.dlgNPC=null;
-  document.getElementById('dlg-wrap').style.display='none';
-}
-
-// ── NOTIFY ────────────────────────────────────────────────
-function notify(msg,type='') {
-  const el=document.getElementById('notif');
-  el.textContent=msg; el.className=type; el.style.display='block';
-  clearTimeout(G.notifTimer);
-  G.notifTimer=setTimeout(()=>el.style.display='none',3800);
-}
-
-// ── QUEST MARKER ──────────────────────────────────────────
-function drawQuestMarker(x,y,sym,color,t) {
-  const b=Math.sin(t*3)*3;
-  ctx.save(); ctx.translate(x-G.cam.x, y-G.cam.y+b);
-  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10;
-  ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.font='bold 12px Georgia'; ctx.fillStyle='#000';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(sym,0,0); ctx.textBaseline='alphabetic';
+function renderWorld(ctx,cx,cy,t){
+  ctx.save(); ctx.translate(-cx,-cy);
+  // Ground
+  ctx.fillStyle='#1C1810'; ctx.fillRect(0,0,WORLD.W,WORLD.H);
+  const T=WORLD.TILE;
+  for(let tx=0;tx<WORLD.W;tx+=T)for(let ty=0;ty<WORLD.H;ty+=T){const h=((tx*7919+ty*6271+tx*ty)&0xff)/255;if(h>.72){ctx.fillStyle=`rgba(32,28,16,${.25+h*.2})`;ctx.fillRect(tx,ty,T,T);}else if(h<.18){ctx.fillStyle='rgba(10,8,4,.2)';ctx.fillRect(tx,ty,T,T);}}
+  // Zones
+  for(const z of ZONES){const s=ZS[z.theme]||ZS.ruins;ctx.fillStyle=s.fill;ctx.fillRect(z.x,z.y,z.w,z.h);ctx.strokeStyle=s.border;ctx.lineWidth=1.5;ctx.setLineDash([8,6]);ctx.strokeRect(z.x+1,z.y+1,z.w-2,z.h-2);ctx.setLineDash([]);ctx.font='bold 12px Georgia';ctx.fillStyle=s.lbl;ctx.globalAlpha=.6;ctx.textAlign='center';ctx.fillText('— '+z.name.toUpperCase()+' —',z.x+z.w/2,z.y+18);ctx.globalAlpha=1;}
+  // Roads
+  const roads=[{x1:0,y1:480,x2:WORLD.W,y2:480,w:32},{x1:850,y1:0,x2:850,y2:1250,w:28},{x1:850,y1:480,x2:1000,y2:1250,w:26},{x1:720,y1:0,x2:1650,y2:0,w:28},{x1:1650,y1:0,x2:1650,y2:480,w:28},{x1:1200,y1:480,x2:1500,y2:750,w:24}];
+  for(const r of roads){ctx.strokeStyle='#282010';ctx.lineWidth=r.w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(r.x1,r.y1);ctx.lineTo(r.x2,r.y2);ctx.stroke();ctx.strokeStyle='#222010';ctx.lineWidth=r.w-6;ctx.beginPath();ctx.moveTo(r.x1,r.y1);ctx.lineTo(r.x2,r.y2);ctx.stroke();ctx.strokeStyle='rgba(50,44,22,.35)';ctx.lineWidth=1;ctx.setLineDash([14,10]);ctx.beginPath();ctx.moveTo(r.x1,r.y1);ctx.lineTo(r.x2,r.y2);ctx.stroke();ctx.setLineDash([]);}ctx.lineCap='butt';
+  // Water
+  const wv=Math.sin(t*.8)*.05;ctx.fillStyle=`rgba(18,40,70,${.85+wv})`;ctx.fillRect(1180,480,20,WORLD.H-480);ctx.fillStyle=`rgba(24,55,95,${.6+wv})`;ctx.fillRect(1178,480,8,WORLD.H-480);ctx.fillStyle='rgba(14,30,55,.8)';ctx.beginPath();ctx.ellipse(400,1050,70,40,0,0,Math.PI*2);ctx.fill();
+  // Decorations
+  for(const d of DECO){if(bContains(d.x,d.y))continue;if(d.type==='rock'){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(d.x+2,d.y+2,d.rx+1,d.ry+.5,d.a,0,Math.PI*2);ctx.fill();ctx.fillStyle='#4A4230';ctx.beginPath();ctx.ellipse(d.x,d.y,d.rx,d.ry,d.a,0,Math.PI*2);ctx.fill();}else if(d.type==='tree'){ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(d.x+3,d.y+3,d.r,d.r*.6,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#2A1808';ctx.fillRect(d.x-2,d.y-2,4,d.r*.7);const g=['#142808','#1C3A0A','#24480C'][d.v%3];ctx.fillStyle=g;ctx.beginPath();ctx.arc(d.x,d.y-d.r*.3,d.r,0,Math.PI*2);ctx.fill();ctx.fillStyle=shade(g,15);ctx.beginPath();ctx.arc(d.x-d.r*.3,d.y-d.r*.5,d.r*.7,0,Math.PI*2);ctx.fill();}else{ctx.fillStyle='#1C3A08';ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fill();}}
+  // Building shadows
+  for(const b of BUILDINGS){ctx.fillStyle='rgba(0,0,0,.32)';ctx.fillRect(b.x+5,b.y+5,b.w,b.h);}
+  // Buildings
+  for(const b of BUILDINGS)drawBuilding(ctx,b);
+  // Barrier
+  const p=.28+.12*Math.sin(t*.9);ctx.shadowColor='#4488ff';ctx.shadowBlur=16;ctx.strokeStyle=`rgba(60,120,255,${p})`;ctx.lineWidth=3;ctx.strokeRect(20,20,WORLD.W-40,WORLD.H-40);ctx.shadowBlur=0;ctx.strokeStyle=`rgba(100,160,255,${p*.4})`;ctx.lineWidth=1;ctx.strokeRect(26,26,WORLD.W-52,WORLD.H-52);
   ctx.restore();
 }
 
-// ── VIGNETTE ──────────────────────────────────────────────
-function drawVignette() {
-  const g=ctx.createRadialGradient(VW/2,VH/2,VH*.28,VW/2,VH/2,VH*.82);
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.58)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,VW,VH);
+function drawBuilding(ctx,b){
+  const tc=TC[b.theme]||TC.neutral,{x,y,w,h,type}=b;
+  if(type==='tower'){drawTower(ctx,b,tc);}
+  else if(type==='altar'){drawAltar(ctx,b,tc);}
+  else if(type==='mine'){drawMineEnt(ctx,b,tc);}
+  else if(type==='ruin'){drawRuin(ctx,b,tc);}
+  else{drawHouse(ctx,b,tc);}
+  if(b.label){ctx.font='9px Georgia';ctx.textAlign='center';ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=3;ctx.strokeText(b.label,x+w/2,y-4);ctx.fillStyle='rgba(200,170,100,.8)';ctx.fillText(b.label,x+w/2,y-4);}
+}
+function drawHouse(ctx,b,tc){
+  const{x,y,w,h}=b,rh=Math.round(h*.3);
+  ctx.fillStyle=tc.wall;ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=tc.roof;ctx.fillRect(x,y,w,rh);
+  ctx.fillStyle=shade(tc.roof,-10);ctx.fillRect(x-2,y,w+4,4);
+  ctx.fillStyle=tc.trim;ctx.fillRect(x,y,4,h);ctx.fillRect(x+w-4,y,4,h);
+  ctx.fillStyle=tc.trim;ctx.fillRect(x,y+rh,w,3);
+  if(w>60){const wx=x+Math.floor(w*.25),wy=y+rh+Math.floor((h-rh)*.2),ww=Math.max(10,Math.floor(w*.2)),wh=Math.max(10,Math.floor((h-rh)*.4));ctx.fillStyle='rgba(180,140,60,.15)';ctx.fillRect(wx,wy,ww,wh);ctx.strokeStyle=tc.trim;ctx.lineWidth=1;ctx.strokeRect(wx,wy,ww,wh);if(w>100){ctx.fillStyle='rgba(180,140,60,.15)';ctx.fillRect(x+Math.floor(w*.6),wy,ww,wh);ctx.strokeStyle=tc.trim;ctx.strokeRect(x+Math.floor(w*.6),wy,ww,wh);}}
+  const dw=Math.max(10,Math.floor(w*.22)),dh=Math.max(12,Math.floor((h-rh)*.55)),dx=x+Math.floor((w-dw)/2),dy=y+h-dh;
+  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(dx,dy,dw,dh);ctx.beginPath();ctx.arc(dx+dw/2,dy,dw/2,Math.PI,0);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+}
+function drawTower(ctx,b,tc){
+  const{x,y,w,h}=b;
+  ctx.fillStyle=tc.wall;ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=tc.roof;const mw=Math.floor(w/5);for(let i=0;i<5;i+=2)ctx.fillRect(x+i*mw,y-8,mw,10);
+  ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1;for(let sy=y+12;sy<y+h;sy+=12){ctx.beginPath();ctx.moveTo(x,sy);ctx.lineTo(x+w,sy);ctx.stroke();}
+  ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x+w/2-3,y+h*.3,6,10);ctx.fillRect(x+w*.2,y+h*.6,5,8);ctx.fillRect(x+w*.7,y+h*.6,5,8);
+  ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=1.5;ctx.strokeRect(x,y-8,w,h+8);
+}
+function drawAltar(ctx,b,tc){
+  const{x,y,w,h}=b;
+  ctx.fillStyle=tc.wall;ctx.fillRect(x,y+h*.5,w,h*.5);ctx.fillStyle=shade(tc.wall,8);ctx.fillRect(x+8,y+h*.3,w-16,h*.2);ctx.fillStyle=shade(tc.wall,15);ctx.fillRect(x+16,y+h*.15,w-32,h*.15);
+  ctx.fillStyle=tc.roof;ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+16,y+h*.15);ctx.lineTo(x+w-16,y+h*.15);ctx.closePath();ctx.fill();
+  const grd=ctx.createRadialGradient(x+w/2,y,2,x+w/2,y+h/2,h*.8);grd.addColorStop(0,'rgba(140,30,200,.22)');grd.addColorStop(1,'rgba(140,30,200,0)');ctx.fillStyle=grd;ctx.fillRect(x-20,y-20,w+40,h+40);
+}
+function drawMineEnt(ctx,b,tc){
+  drawHouse(ctx,b,tc);
+  ctx.fillStyle='#0a0806';ctx.beginPath();ctx.arc(b.x+b.w/2,b.y+b.h,b.w*.35,Math.PI,0);ctx.fill();
+  ctx.strokeStyle=tc.trim;ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x+b.w/2,b.y+b.h,b.w*.35,Math.PI,0);ctx.stroke();
+  ctx.strokeStyle='#5A4A30';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b.x+b.w*.35,b.y+b.h+2);ctx.lineTo(b.x,b.y+b.h+28);ctx.stroke();ctx.beginPath();ctx.moveTo(b.x+b.w*.65,b.y+b.h+2);ctx.lineTo(b.x+b.w,b.y+b.h+28);ctx.stroke();
+}
+function drawRuin(ctx,b,tc){
+  const{x,y,w,h}=b,rng=mkRng(x*31+y*17);
+  ctx.fillStyle=tc.shadow;ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=tc.wall;ctx.fillRect(x,y,10,Math.floor(h*(.4+rng()*.5)));ctx.fillRect(x+w-10,y+h-Math.floor(h*(.3+rng()*.5)),10,Math.floor(h*(.3+rng()*.5)));ctx.fillRect(x,y+h-8,w,8);ctx.fillRect(x,y,Math.floor(w*(.3+rng()*.4)),8);
+  for(let i=0;i<4;i++){ctx.fillStyle=shade(tc.wall,Math.floor(rng()*20));ctx.fillRect(x+rng()*(w-8),y+rng()*(h-8),4+rng()*10,4+rng()*8);}
 }
 
-// ── GAME LOOP ──────────────────────────────────────────────
-function loop(ts) {
-  if(!G.running) return;
+// ── DRAW HUMAN ──────────────────────────────────────────────
+function drawHuman(ctx,px,py,cfg,facing,moving,t){
+  const{bodyColor,cloakColor,skinColor,hairColor,armorColor,scale=1,selected=false}=cfg;
+  ctx.save(); ctx.translate(px,py); ctx.scale(scale,scale);
+  const bob=moving?Math.sin(t*8)*1.5:0;
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,.36)';ctx.beginPath();ctx.ellipse(0,12,9,4,0,0,Math.PI*2);ctx.fill();
+  // Legs
+  const lp=moving?Math.sin(t*9)*4:0;
+  ctx.fillStyle=cloakColor;ctx.beginPath();ctx.ellipse(-3,8+bob,3,4.5,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(3,8-bob,3,4.5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#2A2010';ctx.beginPath();ctx.ellipse(-3.5,10+bob,2.5,1.8,.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(3.5,10-bob,2.5,1.8,-.2,0,Math.PI*2);ctx.fill();
+  // Body
+  ctx.fillStyle=bodyColor;ctx.beginPath();ctx.ellipse(0,0,8,7,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=armorColor;ctx.beginPath();ctx.ellipse(0,0,5,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=cloakColor;ctx.beginPath();ctx.ellipse(-7,-1,3.5,2.5,-.3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(7,-1,3.5,2.5,.3,0,Math.PI*2);ctx.fill();
+  // Arms
+  const as=moving?Math.sin(t*9+Math.PI)*3:0;
+  ctx.fillStyle=skinColor;ctx.beginPath();ctx.ellipse(-8,1+as,2.5,2,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(8,1-as,2.5,2,0,0,Math.PI*2);ctx.fill();
+  // Neck
+  ctx.fillStyle=skinColor;ctx.beginPath();ctx.ellipse(0,-5.5,2.8,2.2,0,0,Math.PI*2);ctx.fill();
+  // Head
+  ctx.fillStyle=skinColor;ctx.beginPath();ctx.ellipse(0,-10,6,5.5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=hairColor;ctx.beginPath();ctx.ellipse(0,-13,5.5,3,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(-4.5,-11,2.5,3,-.4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(4.5,-11,2.5,3,.4,0,Math.PI*2);ctx.fill();
+  // Eyes
+  ctx.fillStyle='#1a1008';ctx.beginPath();ctx.arc(-2.2,-9.5,1.1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(2.2,-9.5,1.1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-2.2,-9.2,.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(2.2,-9.2,.5,0,Math.PI*2);ctx.fill();
+  // Selection ring
+  if(selected){ctx.strokeStyle='rgba(255,220,60,.7)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+  ctx.restore();
+}
+function drawWarrior(ctx,px,py,cfg,f,m,t){
+  drawHuman(ctx,px,py,cfg,f,m,t);
+  ctx.save();ctx.translate(px,py);ctx.fillStyle='#C0C0D0';ctx.fillRect(10,-6,2,10);ctx.fillStyle='#8B6914';ctx.fillRect(9,-2,4,3);ctx.restore();
+}
+function drawMage(ctx,px,py,cfg,f,m,t){
+  drawHuman(ctx,px,py,cfg,f,m,t);
+  ctx.save();ctx.translate(px,py);ctx.fillStyle='#5A3A10';ctx.fillRect(-11,-18,2,26);const gw=.6+.4*Math.sin(t*2.5);ctx.shadowColor='#4080ff';ctx.shadowBlur=6*gw;ctx.fillStyle=`rgba(80,140,255,${gw})`;ctx.beginPath();ctx.arc(-10,-20,3,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.restore();
+}
+function drawShaman(ctx,px,py,cfg,f,m,t){
+  drawHuman(ctx,px,py,cfg,f,m,t);
+  ctx.save();ctx.translate(px,py);ctx.fillStyle='#3A2808';ctx.fillRect(-11,-16,2,24);const gw=.5+.5*Math.sin(t*1.8);ctx.shadowColor='#9020D0';ctx.shadowBlur=8*gw;ctx.fillStyle=`rgba(160,30,200,${.7*gw})`;ctx.beginPath();ctx.arc(-10,-19,3.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.restore();
+}
+function renderNPC(ctx,npc,isNear,t){
+  const cfg={...npc,selected:isNear};
+  if(npc.role==='mage')drawMage(ctx,npc.x,npc.y,cfg,'down',false,t);
+  else if(npc.role==='shaman')drawShaman(ctx,npc.x,npc.y,cfg,'down',false,t);
+  else if(npc.role==='warrior')drawWarrior(ctx,npc.x,npc.y,cfg,'down',false,t);
+  else drawHuman(ctx,npc.x,npc.y,cfg,'down',false,t);
+  ctx.font='bold 10px Georgia';ctx.textAlign='center';ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=3;ctx.strokeText(npc.name,npc.x,npc.y-25);ctx.fillStyle=isNear?'#FFE050':'#C8A860';ctx.fillText(npc.name,npc.x,npc.y-25);
+  if(isNear){const b=Math.sin(t*4)*2;ctx.font='bold 11px Georgia';ctx.strokeStyle='rgba(0,0,0,.95)';ctx.lineWidth=3;ctx.strokeText('[E]',npc.x,npc.y-36+b);ctx.fillStyle='#FFD700';ctx.fillText('[E]',npc.x,npc.y-36+b);}
+}
+function renderPlayer(ctx,px,py,moving,facing,t){
+  const cfg={bodyColor:'#7A5030',cloakColor:'#5A3818',skinColor:'#D4A870',hairColor:'#2A1408',armorColor:'#6A4828',scale:1.1};
+  drawHuman(ctx,px,py,cfg,facing,moving,t);
+  ctx.save();ctx.translate(px,py);ctx.globalAlpha=.38;ctx.fillStyle='#4A2810';ctx.beginPath();ctx.moveTo(-6,2);ctx.lineTo(6,2);ctx.lineTo(3,14);ctx.lineTo(-3,14);ctx.closePath();ctx.fill();ctx.globalAlpha=1;ctx.restore();
+  ctx.font='bold 9px Georgia';ctx.textAlign='center';ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=3;ctx.strokeText('[ Ты ]',px,py-26);ctx.fillStyle='#E8D888';ctx.fillText('[ Ты ]',px,py-26);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENGINE
+// ═══════════════════════════════════════════════════════════
+const VW=800,VH=600;
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const mmC=document.getElementById('minimap');
+const mmCtx=mmC.getContext('2d');
+
+function resize(){
+  const r=Math.min(window.innerWidth/VW,window.innerHeight/VH);
+  canvas.style.width=(VW*r)+'px'; canvas.style.height=(VH*r)+'px';
+  canvas.width=VW; canvas.height=VH;
+}
+window.addEventListener('resize',resize);
+
+const G={running:false,t:0,questState:'none',cam:{x:0,y:0},player:{x:600,y:530,facing:'down',moving:false},keys:{},dlgOpen:false,dlgNPC:null,lastTime:0,notifTimer:null,visitedZones:new Set()};
+
+// ── KEYBOARD ──
+window.addEventListener('keydown',e=>{
+  G.keys[e.code]=true;
+  if(e.code==='KeyE'&&!G.dlgOpen){tryInteract();e.preventDefault();}
+  if(e.code==='Escape'&&G.dlgOpen){closeDlg();e.preventDefault();}
+});
+window.addEventListener('keyup',e=>{G.keys[e.code]=false;});
+
+// ── JOYSTICK ──────────────────────────────────────────────
+const joyZone =document.getElementById('joy-zone');
+const joyKnob =document.getElementById('joy-knob');
+const btnE     =document.getElementById('btn-e');
+const JOY_R    =55;   // радиус базы
+const KNOB_MAX =38;   // макс смещение стика
+
+const joy={active:false,id:null,bx:0,by:0,dx:0,dy:0};
+
+function getJoyCenter(){
+  const r=joyZone.getBoundingClientRect();
+  return{x:r.left+r.width/2, y:r.top+r.height/2};
+}
+
+function updateKnob(){
+  const dist=Math.min(KNOB_MAX,Math.hypot(joy.dx,joy.dy));
+  const ang=Math.atan2(joy.dy,joy.dx);
+  const kx=Math.cos(ang)*dist, ky=Math.sin(ang)*dist;
+  joyKnob.style.transform=`translate(calc(-50% + ${kx}px), calc(-50% + ${ky}px))`;
+  joyKnob.classList.toggle('active',joy.active);
+}
+
+joyZone.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const touch=e.changedTouches[0];
+  joy.active=true; joy.id=touch.identifier;
+  const c=getJoyCenter(); joy.bx=c.x; joy.by=c.y;
+  joy.dx=touch.clientX-joy.bx; joy.dy=touch.clientY-joy.by;
+  updateKnob();
+},{passive:false});
+
+window.addEventListener('touchmove',e=>{
+  if(!joy.active)return;
+  for(const touch of e.changedTouches){
+    if(touch.identifier===joy.id){
+      joy.dx=touch.clientX-joy.bx; joy.dy=touch.clientY-joy.by;
+      updateKnob(); break;
+    }
+  }
+},{passive:false});
+
+function joyEnd(e){
+  for(const touch of e.changedTouches){
+    if(touch.identifier===joy.id){
+      joy.active=false; joy.dx=0; joy.dy=0; updateKnob(); break;
+    }
+  }
+}
+window.addEventListener('touchend',joyEnd);
+window.addEventListener('touchcancel',joyEnd);
+
+// Action button
+btnE.addEventListener('touchstart',e=>{e.preventDefault();btnE.classList.add('lit');if(!G.dlgOpen)tryInteract();},{passive:false});
+btnE.addEventListener('touchend',e=>{e.preventDefault();btnE.classList.remove('lit');},{passive:false});
+
+// Detect touch device
+function isTouchDevice(){return'ontouchstart' in window||navigator.maxTouchPoints>0;}
+
+// ── COLLISION ──
+function collides(nx,ny){
+  if(nx<28||nx>WORLD.W-28||ny<28||ny>WORLD.H-28)return true;
+  for(const b of BUILDINGS){const cx=Math.max(b.x+2,Math.min(nx,b.x+b.w-2)),cy=Math.max(b.y+2,Math.min(ny,b.y+b.h-2));if(Math.hypot(nx-cx,ny-cy)<WORLD.PLAYER_R+1)return true;}
+  return false;
+}
+
+function getZone(px,py){for(const z of ZONES)if(px>=z.x&&px<=z.x+z.w&&py>=z.y&&py<=z.y+z.h)return z.name;return'Нейтральная зона';}
+
+// ── HUD ──
+let _lz='',_hudT=0;
+function updateHUD(){
+  const zone=getZone(G.player.x,G.player.y);
+  document.getElementById('hud-loc-name').textContent=zone;
+  if(zone!==_lz){if(zone!=='Нейтральная зона'&&!G.visitedZones.has(zone)){G.visitedZones.add(zone);notify('Вы вошли в: '+zone);}_lz=zone;}
+  const el=document.getElementById('hud-qt');
+  const map={none:['Нет активных заданий',''],active:['Найди Торса у Башни стражи',''],found:['Торс найден — вернись к Рагнару',''],done:['✓ Квест завершён','done']};
+  const[txt,cls]=map[G.questState]||map.none; el.textContent=txt; el.className=cls;
+}
+
+// ── MINIMAP ──
+const MM_W=110,MM_H=83,SX=MM_W/WORLD.W,SY=MM_H/WORLD.H;
+const MMZC={old:'#5A2808',new:'#0C3A0C',cult:'#280650',mine:'#3A2A10',ruins:'#2A2010'};
+function drawMinimap(){
+  mmCtx.fillStyle='#0E0C08';mmCtx.fillRect(0,0,MM_W,MM_H);
+  for(const z of ZONES){mmCtx.fillStyle=MMZC[z.theme]||'#1A1808';mmCtx.fillRect(z.x*SX,z.y*SY,z.w*SX,z.h*SY);}
+  mmCtx.fillStyle='#6A4A18';for(const b of BUILDINGS)mmCtx.fillRect(b.x*SX,b.y*SY,Math.max(2,b.w*SX),Math.max(2,b.h*SY));
+  mmCtx.fillStyle='#1A3050';mmCtx.fillRect(1180*SX,480*SY,20*SX,MM_H);
+  mmCtx.strokeStyle='rgba(60,120,255,.5)';mmCtx.lineWidth=1;mmCtx.strokeRect(1,1,MM_W-2,MM_H-2);
+  for(const n of NPC_DATA){mmCtx.fillStyle=n.role==='mage'?'#4080FF':n.role==='shaman'?'#A030D0':'#C08830';mmCtx.beginPath();mmCtx.arc(n.x*SX,n.y*SY,1.5,0,Math.PI*2);mmCtx.fill();}
+  mmCtx.fillStyle='#FFE050';mmCtx.shadowColor='#FFD700';mmCtx.shadowBlur=4;mmCtx.beginPath();mmCtx.arc(G.player.x*SX,G.player.y*SY,3,0,Math.PI*2);mmCtx.fill();mmCtx.shadowBlur=0;
+}
+
+// ── DIALOGUE ──
+const ROLES={warrior:'Воин',mage:'Маг',shaman:'Жрец',worker:'Рабочий',merchant:'Торговец',thug:'Головорез',prisoner:'Заключённый'};
+function tryInteract(){let best=null,bd=WORLD.INTERACT_R;for(const n of NPC_DATA){const d=Math.hypot(G.player.x-n.x,G.player.y-n.y);if(d<bd){best=n;bd=d;}}if(best)openDlg(best);}
+function getBranch(n){const s=G.questState;if(n.id==='captain'){if(s==='active'||s==='found')return n.dialogues.quest_active||n.dialogues.default;if(s==='done')return n.dialogues.quest_done;}if(n.id==='tors'&&s==='done')return n.dialogues.quest_done;return n.dialogues.default;}
+function openDlg(n){
+  G.dlgOpen=true;G.dlgNPC=n;
+  document.getElementById('dlg-nname').textContent=n.name;
+  document.getElementById('dlg-nrole').textContent=ROLES[n.role]||'Житель колонии';
+  drawPortrait(n);renderBranch(n,getBranch(n));
+  document.getElementById('dlg-wrap').style.display='block';
+}
+function drawPortrait(n){
+  const pc=document.getElementById('portrait-c'),pctx=pc.getContext('2d');
+  pctx.clearRect(0,0,48,48);pctx.fillStyle='rgba(15,10,4,1)';pctx.fillRect(0,0,48,48);
+  const cfg={...n,scale:1};
+  if(n.role==='mage')drawMage(pctx,24,34,cfg,'down',false,G.t);
+  else if(n.role==='shaman')drawShaman(pctx,24,34,cfg,'down',false,G.t);
+  else if(n.role==='warrior')drawWarrior(pctx,24,34,cfg,'down',false,G.t);
+  else drawHuman(pctx,24,34,cfg,'down',false,G.t);
+}
+function renderBranch(n,b){
+  document.getElementById('dlg-text').textContent=b.text;
+  const el=document.getElementById('dlg-opts');el.innerHTML='';
+  for(const o of b.opts){const btn=document.createElement('button');btn.className='dopt';btn.textContent=o.l;btn.onclick=()=>handleOpt(n,o);el.appendChild(btn);}
+}
+function handleOpt(n,o){
+  if(o.act==='ACCEPT'){G.questState='active';updateHUD();notify('Задание принято: найди Кривого Торса у Башни стражи');}
+  if(o.act==='COMPLETE'){G.questState='found';updateHUD();notify('✓ Торс найден! Вернись к Рагнару');}
+  if(o.go&&n.dialogues[o.go]){renderBranch(n,n.dialogues[o.go]);drawPortrait(n);return;}
+  closeDlg();
+}
+function closeDlg(){G.dlgOpen=false;G.dlgNPC=null;document.getElementById('dlg-wrap').style.display='none';}
+
+function notify(msg){
+  const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';
+  clearTimeout(G.notifTimer);G.notifTimer=setTimeout(()=>el.style.display='none',3800);
+}
+
+// ── QUEST MARKERS ──
+function drawQuestMarker(x,y,sym,color,t){
+  const b=Math.sin(t*3)*3;ctx.save();ctx.translate(x-G.cam.x,y-G.cam.y+b);
+  ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  ctx.font='bold 12px Georgia';ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(sym,0,0);ctx.textBaseline='alphabetic';
+  ctx.restore();
+}
+
+function drawVignette(){
+  const g=ctx.createRadialGradient(VW/2,VH/2,VH*.28,VW/2,VH/2,VH*.82);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+}
+
+// ── GAME LOOP ──
+function loop(ts){
+  if(!G.running)return;
   requestAnimationFrame(loop);
   const dt=Math.min((ts-G.lastTime)/1000,.05);
   G.lastTime=ts; G.t=ts/1000;
 
-  // Movement
   if(!G.dlgOpen){
+    // Keyboard
     let vx=0,vy=0;
     if(G.keys['ArrowLeft'] ||G.keys['KeyA']){vx-=1;G.player.facing='left';}
     if(G.keys['ArrowRight']||G.keys['KeyD']){vx+=1;G.player.facing='right';}
     if(G.keys['ArrowUp']   ||G.keys['KeyW']){vy-=1;G.player.facing='up';}
     if(G.keys['ArrowDown'] ||G.keys['KeyS']){vy+=1;G.player.facing='down';}
-    if(vx!==0&&vy!==0){vx*=.707;vy*=.707;}
-    G.player.moving=(vx!==0||vy!==0);
+
+    // Joystick — добавляем поверх клавиатуры
+    if(joy.active){
+      const len=Math.hypot(joy.dx,joy.dy);
+      if(len>4){
+        const nx=joy.dx/len, ny=joy.dy/len;
+        // deadzone 10%
+        const scale=Math.min(1,(len-4)/(KNOB_MAX-4));
+        vx+=nx*scale; vy+=ny*scale;
+        // facing
+        if(Math.abs(nx)>Math.abs(ny)) G.player.facing=nx>0?'right':'left';
+        else G.player.facing=ny>0?'down':'up';
+      }
+    }
+
+    // Normalize diagonal
+    const mag=Math.hypot(vx,vy);
+    if(mag>1){vx/=mag;vy/=mag;}
+    G.player.moving=(mag>0.05);
+
     if(G.player.moving){
       const spd=WORLD.PLAYER_SPEED*dt;
       const nx=G.player.x+vx*spd, ny=G.player.y+vy*spd;
-      if(!collides(nx,G.player.y)) G.player.x=nx;
-      if(!collides(G.player.x,ny)) G.player.y=ny;
+      if(!collides(nx,G.player.y))G.player.x=nx;
+      if(!collides(G.player.x,ny))G.player.y=ny;
     }
   } else { G.player.moving=false; }
 
-  // Camera
   G.cam.x=Math.max(0,Math.min(G.player.x-VW/2,WORLD.W-VW));
   G.cam.y=Math.max(0,Math.min(G.player.y-VH/2,WORLD.H-VH));
-
-  // HUD throttle
   _hudT+=dt; if(_hudT>.18){_hudT=0;updateHUD();}
 
-  // ── RENDER ──────────────────────────────────────────────
   ctx.clearRect(0,0,VW,VH);
-  renderWorld(ctx, G.cam.x, G.cam.y, G.t);
+  renderWorld(ctx,G.cam.x,G.cam.y,G.t);
 
-  // Quest markers (screen space)
   for(const n of NPC_DATA){
-    if(n.id==='captain'&&G.questState==='none') drawQuestMarker(n.x,n.y-42,'!','#FFD700',G.t);
-    if(n.id==='tors'&&G.questState==='active')  drawQuestMarker(n.x,n.y-42,'?','#60C0FF',G.t);
+    if(n.id==='captain'&&G.questState==='none')  drawQuestMarker(n.x,n.y-42,'!','#FFD700',G.t);
+    if(n.id==='tors'&&G.questState==='active')   drawQuestMarker(n.x,n.y-42,'?','#60C0FF',G.t);
     if(n.id==='captain'&&G.questState==='found') drawQuestMarker(n.x,n.y-42,'!','#80FF80',G.t);
   }
 
-  // NPCs & player (world space)
-  ctx.save(); ctx.translate(-G.cam.x,-G.cam.y);
-  for(const n of NPC_DATA){
-    const near=Math.hypot(G.player.x-n.x,G.player.y-n.y)<WORLD.INTERACT_R;
-    renderNPC(ctx,n,near,G.t);
-  }
+  ctx.save();ctx.translate(-G.cam.x,-G.cam.y);
+  for(const n of NPC_DATA){const near=Math.hypot(G.player.x-n.x,G.player.y-n.y)<WORLD.INTERACT_R;renderNPC(ctx,n,near,G.t);}
   renderPlayer(ctx,G.player.x,G.player.y,G.player.moving,G.player.facing,G.t);
   ctx.restore();
 
-  // Minimap + vignette
   drawMinimap();
   drawVignette();
-
-  // Portrait live update
-  if(G.dlgOpen&&G.dlgNPC) drawPortrait(G.dlgNPC);
+  if(G.dlgOpen&&G.dlgNPC)drawPortrait(G.dlgNPC);
 }
 
-// ── START / BACK ──────────────────────────────────────────
-document.getElementById('start-btn').onclick = function(){
+// ── START / BACK ──
+document.getElementById('start-btn').onclick=function(){
   document.getElementById('title').style.display='none';
   document.getElementById('game').style.display='block';
   resize();
+
+  // Показываем мобильное управление если тач-устройство
+  if(isTouchDevice()){
+    joyZone.style.display='block';
+    btnE.style.display='flex';
+    document.getElementById('ctrl').style.display='none';
+    document.getElementById('mm-wrap').style.bottom='160px';
+  }
+
   Object.assign(G,{running:true,t:0,questState:'none',keys:{},dlgOpen:false,dlgNPC:null,visitedZones:new Set()});
-  G.player.x=600; G.player.y=530; G.player.facing='down';
-  _lz=''; updateHUD();
+  G.player.x=600;G.player.y=530;G.player.facing='down';
+  _lz='';updateHUD();
   G.lastTime=performance.now();
   requestAnimationFrame(loop);
 };
 
 function backToTitle(){
-  G.running=false; G.keys={};
+  G.running=false;G.keys={};
+  joy.active=false;joy.dx=0;joy.dy=0;updateKnob();
   closeDlg();
   document.getElementById('game').style.display='none';
   document.getElementById('title').style.display='flex';
 }
 
 window.addEventListener('load',resize);
+
+// Prevent default scroll/zoom on touch
+document.addEventListener('touchmove',e=>{if(e.target===canvas||e.target===joyZone||e.target===joyKnob)e.preventDefault();},{passive:false});
 </script>
 </body>
 </html>
