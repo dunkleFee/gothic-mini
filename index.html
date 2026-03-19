@@ -3,1313 +3,833 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>GOTHIC: За барьером</title>
+<title>GOTHIC FPS</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --gold:#c8922a;--gold2:#e8b84a;--blood:#8a1a1a;--stone:#2a2018;
-  --ink:#0a0806;--parchment:#c8a870;--shadow:rgba(0,0,0,0.8);
-  --blue:#2a4a8a;--green:#2a5a2a;--purple:#5a2a8a;
-}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
-html,body{width:100%;height:100%;background:#0a0806;overflow:hidden;font-family:'IM Fell English',serif;}
- 
-/* ═══ TITLE SCREEN ═══════════════════════════════════ */
-#title-screen{
-  position:fixed;inset:0;z-index:1000;
-  background:radial-gradient(ellipse at 50% 60%, #1a0e04 0%, #080402 70%);
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:env(safe-area-inset-top,20px) 24px 20px;
-  overflow-y:auto;
-}
-.title-rune{font-size:clamp(42px,10vw,68px);line-height:1;margin-top:10px;filter:drop-shadow(0 0 20px rgba(200,146,42,0.6));}
-.title-main{
-  font-family:'MedievalSharp',serif;
-  font-size:clamp(28px,8vw,52px);
-  color:var(--gold);letter-spacing:6px;text-transform:uppercase;
-  text-shadow:0 0 40px rgba(200,146,42,0.5),0 3px 0 #3a1a00;
-  margin:6px 0 2px;
-}
-.title-sub{font-size:clamp(10px,3vw,13px);color:#5a3a18;letter-spacing:10px;text-transform:uppercase;margin-bottom:20px;}
-.title-divider{width:100%;max-width:340px;height:1px;background:linear-gradient(90deg,transparent,#5a3a18,transparent);margin:6px 0 18px;}
-.title-lore{
-  font-size:clamp(13px,3.8vw,16px);color:#8a6840;text-align:center;
-  max-width:340px;line-height:1.75;margin-bottom:22px;font-style:italic;
-}
-.paths-title{font-size:10px;color:#4a2a10;letter-spacing:6px;text-transform:uppercase;margin-bottom:14px;}
- 
-.path-card{
-  width:100%;max-width:360px;
-  background:linear-gradient(145deg,#120c04,#0e0804);
-  border:1px solid #3a2410;border-radius:2px;
-  padding:14px 16px;margin-bottom:8px;cursor:pointer;
-  display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;
-  transition:border-color 0.2s,box-shadow 0.2s;
-  position:relative;overflow:hidden;
-}
-.path-card::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,var(--c) 0%,transparent 40%);
-  opacity:0.04;pointer-events:none;
-}
-.path-card:active{border-color:var(--c);box-shadow:0 0 20px rgba(var(--cr),0.2);transform:scale(0.99);}
-.path-icon{
-  width:52px;height:52px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--cr),0.15),transparent);
-  border:1px solid rgba(var(--cr),0.3);
-  display:flex;align-items:center;justify-content:center;font-size:26px;
-}
-.path-name{font-family:'MedievalSharp',serif;font-size:clamp(13px,4vw,16px);color:var(--c);margin-bottom:3px;}
-.path-desc{font-size:clamp(11px,3vw,13px);color:#5a4020;line-height:1.4;margin-bottom:4px;}
-.path-tags{display:flex;gap:5px;flex-wrap:wrap;}
-.path-tag{font-size:9px;color:var(--c);border:1px solid var(--c);border-radius:1px;padding:1px 5px;opacity:0.5;letter-spacing:1px;text-transform:uppercase;}
- 
-/* ═══ GAME UI ════════════════════════════════════════ */
-#game-wrap{position:fixed;inset:0;display:none;}
-#game-canvas{position:absolute;inset:0;touch-action:none;}
- 
-/* HUD top */
-#hud-top{
-  position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;
-  padding:8px 12px;display:flex;justify-content:space-between;align-items:flex-start;
-  pointer-events:none;z-index:20;
-}
-#hud-quest-box{
-  background:rgba(6,3,1,0.88);border:1px solid #2a1808;border-radius:2px;
-  padding:7px 11px;max-width:58%;backdrop-filter:blur(3px);
-}
-#hud-qt{font-family:'MedievalSharp',serif;font-size:8px;color:#4a2a0c;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;}
-#hud-qv{font-size:12px;color:#a07838;line-height:1.35;}
-#hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-#hud-loc{
-  background:rgba(6,3,1,0.88);border:1px solid #2a1808;border-radius:2px;
-  padding:6px 10px;font-family:'MedievalSharp',serif;font-size:10px;color:#8a5828;
-  backdrop-filter:blur(3px);
-}
-#hud-inv{
-  background:rgba(6,3,1,0.88);border:1px solid #1a1006;border-radius:2px;
-  padding:4px 8px;font-size:11px;color:#6a4820;display:none;
-  backdrop-filter:blur(3px);
-}
- 
-/* map button */
-#btn-map{
-  position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:16px;
-  width:54px;height:54px;border-radius:50%;
-  background:rgba(6,3,1,0.92);border:1px solid #5a3818;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;z-index:25;gap:1px;
-  box-shadow:0 4px 16px rgba(0,0,0,0.6);
-}
-#btn-map:active{border-color:var(--gold);}
-#btn-map span:first-child{font-size:22px;}
-#btn-map span:last-child{font-size:8px;color:#5a3818;letter-spacing:1px;font-family:'MedievalSharp',serif;}
- 
-/* action button */
-#btn-act{
-  position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;
-  width:62px;height:62px;border-radius:50%;
-  background:rgba(6,3,1,0.92);border:1.5px solid #8a5820;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;z-index:25;gap:1px;
-  box-shadow:0 4px 24px rgba(0,0,0,0.7),0 0 20px rgba(200,146,42,0.1);
-}
-#btn-act:active{border-color:var(--gold);box-shadow:0 0 28px rgba(200,146,42,0.35);}
-#btn-act span:first-child{font-size:24px;line-height:1;}
-#btn-act span:last-child{font-size:8px;color:#7a4818;letter-spacing:1px;font-family:'MedievalSharp',serif;}
- 
-/* Dialogue */
-#dlg{
-  position:absolute;bottom:0;left:0;right:0;z-index:40;
-  background:linear-gradient(180deg,transparent,rgba(6,3,1,0.98) 20%);
-  padding-bottom:env(safe-area-inset-bottom,0);
-  display:none;
-}
-#dlg-box{
-  margin:0;
-  background:linear-gradient(160deg,#0e0804,#08050200);
-  border-top:1px solid #2a1808;
-  border-radius:10px 10px 0 0;
-  padding:14px 18px 18px;
-  min-height:130px;
-  position:relative;
-}
-#dlg-bar{position:absolute;top:0;left:0;right:0;height:2px;background:#1a1006;border-radius:10px 10px 0 0;overflow:hidden;}
-#dlg-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.25s;}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Cinzel',serif;}
+#c{display:block;touch-action:none;image-rendering:pixelated;}
+
+/* ── CROSSHAIR ── */
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:10;}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(220,180,60,.7);}
+#crosshair::before{width:14px;height:1.5px;top:50%;left:50%;transform:translate(-50%,-50%);}
+#crosshair::after{width:1.5px;height:14px;top:50%;left:50%;transform:translate(-50%,-50%);}
+
+/* ── HUD bars ── */
+#hud{position:fixed;bottom:env(safe-area-inset-bottom,0);left:0;right:0;z-index:20;pointer-events:none;}
+#hud-bars{display:flex;justify-content:space-between;align-items:flex-end;padding:0 14px 10px;}
+#hp-box,#xp-box{background:rgba(4,2,0,.85);border:1px solid #2a1808;border-radius:3px;padding:6px 10px;min-width:100px;}
+#hp-label,#xp-label{font-size:8px;color:#3a2008;letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;}
+#hp-bar,#xp-bar{height:5px;border-radius:2px;transition:width .3s;}
+#hp-bar{background:linear-gradient(90deg,#8a1a1a,#e03030);}
+#xp-bar{background:linear-gradient(90deg,#1a5a1a,#30e030);}
+#hp-val,#xp-val{font-size:10px;margin-top:2px;}
+#hp-val{color:#e04040;}
+#xp-val{color:#40c040;}
+
+#center-info{position:fixed;top:50%;left:50%;transform:translate(-50%,30px);pointer-events:none;z-index:15;text-align:center;}
+#interact-prompt{background:rgba(4,2,0,.88);border:1px solid #5a3010;border-radius:3px;padding:7px 14px;font-size:11px;color:#c8922a;display:none;}
+
+/* ── MINI MAP ── */
+#minimap{position:fixed;top:calc(env(safe-area-inset-top,0px)+8px);right:12px;width:90px;height:90px;border:1px solid #2a1808;border-radius:3px;background:rgba(4,2,0,.88);z-index:20;pointer-events:none;}
+#minimap canvas{display:block;}
+
+/* ── TOP HUD ── */
+#top-hud{position:fixed;top:calc(env(safe-area-inset-top,0px)+8px);left:12px;z-index:20;pointer-events:none;}
+#quest-box{background:rgba(4,2,0,.88);border:1px solid #2a1808;border-radius:3px;padding:7px 11px;max-width:180px;}
+#quest-label{font-size:7px;color:#3a2008;letter-spacing:3px;margin-bottom:2px;}
+#quest-text{font-size:11px;color:#a07838;line-height:1.3;}
+#inv-box{background:rgba(4,2,0,.88);border:1px solid #1a1006;border-radius:3px;padding:4px 8px;font-size:10px;color:#5a3818;margin-top:4px;display:none;}
+
+/* ── CONTROLS ── */
+#controls{position:fixed;bottom:env(safe-area-inset-bottom,0);left:0;right:0;height:160px;z-index:25;}
+#joystick-area{position:absolute;left:0;bottom:0;width:50%;height:160px;}
+#joystick-ring{position:absolute;left:60px;bottom:60px;width:80px;height:80px;border-radius:50%;border:1px solid rgba(200,146,42,.25);background:rgba(4,2,0,.4);}
+#joystick-dot{position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(200,146,42,.5);border:1px solid rgba(200,146,42,.6);top:50%;left:50%;transform:translate(-50%,-50%);transition:none;}
+#look-area{position:absolute;right:0;bottom:0;width:50%;height:160px;background:transparent;}
+#btn-action{position:absolute;right:20px;bottom:20px;width:64px;height:64px;border-radius:50%;background:rgba(4,2,0,.92);border:1.5px solid #8a5820;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 4px 20px rgba(0,0,0,.7);}
+#btn-action:active{border-color:#c8922a;box-shadow:0 0 20px rgba(200,146,42,.4);}
+#btn-action .ba-ico{font-size:24px;line-height:1;}
+#btn-action .ba-lbl{font-size:7px;color:#6a3818;letter-spacing:1px;}
+#btn-attack{position:absolute;right:96px;bottom:24px;width:50px;height:50px;border-radius:50%;background:rgba(60,4,4,.92);border:1.5px solid #6a1010;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;font-size:22px;}
+#btn-attack:active{border-color:#e04040;box-shadow:0 0 16px rgba(220,40,40,.5);}
+#btn-sprint{position:absolute;left:160px;bottom:50px;width:42px;height:42px;border-radius:50%;background:rgba(4,2,0,.88);border:1px solid #3a2010;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:30;}
+#btn-sprint:active{border-color:#c8922a;}
+
+/* ── DIALOGUE ── */
+#dlg{position:fixed;bottom:0;left:0;right:0;z-index:50;display:none;padding-bottom:env(safe-area-inset-bottom,0);}
+#dlg-box{background:linear-gradient(160deg,rgba(10,6,2,.98),rgba(6,3,1,.99));border-top:1px solid #2a1808;border-radius:10px 10px 0 0;padding:14px 18px 18px;min-height:120px;position:relative;}
+#dlg-prog{position:absolute;top:0;left:0;right:0;height:2px;background:#1a1006;border-radius:10px 10px 0 0;overflow:hidden;}
+#dlg-fill{height:100%;background:linear-gradient(90deg,#c8922a,#e8b84a);transition:width .25s;}
 #dlg-who{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-#dlg-ico{font-size:20px;}
-#dlg-name{font-family:'MedievalSharp',serif;font-size:15px;font-weight:bold;}
-#dlg-sep{flex:1;height:1px;background:linear-gradient(90deg,currentColor,transparent);opacity:0.2;}
-#dlg-body{font-size:14px;color:#d4b87a;line-height:1.65;margin-bottom:10px;}
-#dlg-tap{font-size:10px;color:#3a2010;text-align:right;letter-spacing:2px;font-family:'MedievalSharp',serif;}
- 
-/* Toast */
-#toast{
-  position:absolute;top:calc(env(safe-area-inset-top,0px) + 58px);left:50%;
-  transform:translateX(-50%) translateY(-20px);
-  background:linear-gradient(135deg,#160e04,#0e0802);
-  border:1px solid #4a2e10;border-radius:4px;
-  padding:10px 18px;font-size:13px;color:var(--gold);
-  text-align:center;white-space:nowrap;
-  opacity:0;transition:opacity 0.3s,transform 0.3s;
-  pointer-events:none;z-index:60;
-  box-shadow:0 6px 24px rgba(0,0,0,0.7);
-  max-width:90vw;white-space:normal;
-}
+#dlg-ico{font-size:18px;}
+#dlg-nm{font-size:15px;font-weight:bold;}
+#dlg-sep{flex:1;height:1px;opacity:.2;}
+#dlg-body{font-size:14px;color:#d4b87a;line-height:1.6;margin-bottom:8px;}
+#dlg-hint{font-size:9px;color:#3a2010;text-align:right;letter-spacing:2px;}
+
+/* ── CHOICES ── */
+#choices{position:fixed;bottom:0;left:0;right:0;z-index:55;display:none;padding:0 14px calc(env(safe-area-inset-bottom,0px)+14px);}
+#choices-box{background:rgba(8,4,2,.97);border:1px solid #3a1808;border-radius:8px 8px 0 0;padding:12px 0 4px;}
+#choices-title{font-size:9px;color:#3a1808;letter-spacing:4px;text-align:center;margin-bottom:10px;}
+.choice-btn{display:block;width:100%;padding:12px 18px;background:transparent;border:none;border-top:1px solid #1a0e04;text-align:left;cursor:pointer;font-family:'Cinzel',serif;font-size:13px;color:#8a6030;transition:background .15s,color .15s;}
+.choice-btn:active{background:rgba(200,146,42,.1);color:#c8922a;}
+
+/* ── COMBAT FLASH ── */
+#hit-flash{position:fixed;inset:0;background:rgba(200,30,30,.35);pointer-events:none;z-index:60;opacity:0;transition:opacity .1s;}
+#heal-flash{position:fixed;inset:0;background:rgba(30,200,30,.2);pointer-events:none;z-index:60;opacity:0;transition:opacity .1s;}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:calc(env(safe-area-inset-top,0px)+110px);left:50%;transform:translateX(-50%) translateY(-10px);background:rgba(10,5,2,.92);border:1px solid #4a2e10;border-radius:3px;padding:8px 16px;font-size:11px;color:#c8922a;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:65;max-width:85vw;text-align:center;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
- 
-/* MAP OVERLAY */
-#map-overlay{
-  position:absolute;inset:0;z-index:80;
-  background:rgba(4,2,0,0.97);
-  display:none;flex-direction:column;
-  padding:env(safe-area-inset-top,20px) 20px 20px;
-}
-#map-title{font-family:'MedievalSharp',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:6px;letter-spacing:4px;}
-#map-sub{font-size:11px;color:#4a2a10;text-align:center;letter-spacing:4px;margin-bottom:20px;}
-.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;}
-.map-loc{
-  background:linear-gradient(145deg,#120a04,#0a0602);
-  border:1px solid #2a1808;border-radius:3px;
-  padding:14px 12px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  transition:all 0.2s;position:relative;overflow:hidden;
-}
-.map-loc.active{border-color:var(--gold);box-shadow:0 0 16px rgba(200,146,42,0.2);}
-.map-loc.locked{opacity:0.35;cursor:default;}
-.map-loc:not(.locked):active{transform:scale(0.97);border-color:var(--gold);}
-.map-loc-icon{font-size:30px;}
-.map-loc-name{font-family:'MedievalSharp',serif;font-size:12px;color:var(--parchment);text-align:center;}
-.map-loc-desc{font-size:10px;color:#5a3a18;text-align:center;line-height:1.4;}
-.map-loc-badge{
-  position:absolute;top:6px;right:6px;
-  font-size:9px;color:var(--gold);border:1px solid var(--gold);
-  border-radius:1px;padding:1px 4px;opacity:0.7;letter-spacing:1px;
-}
-.map-loc-new{
-  position:absolute;top:6px;left:6px;
-  font-size:9px;color:#e05050;border:1px solid #e05050;
-  border-radius:1px;padding:1px 4px;letter-spacing:1px;
-}
-#map-close{
-  margin-top:16px;text-align:center;font-family:'MedievalSharp',serif;
-  font-size:11px;color:#3a2010;letter-spacing:4px;text-transform:uppercase;
-  padding:10px;cursor:pointer;border-top:1px solid #1a1008;
-}
-#map-close:active{color:var(--gold);}
- 
-/* ENDING */
-#ending{
-  position:absolute;inset:0;z-index:100;
-  background:radial-gradient(ellipse at 50% 40%,#140a02,#060300);
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  padding:30px 24px;text-align:center;
-}
-.end-icon{font-size:64px;margin-bottom:16px;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{filter:drop-shadow(0 0 8px rgba(200,146,42,0.4));}50%{filter:drop-shadow(0 0 24px rgba(200,146,42,0.8));}}
-.end-chapter{font-size:10px;color:#4a2a08;letter-spacing:6px;text-transform:uppercase;margin-bottom:6px;}
-.end-title{font-family:'MedievalSharp',serif;font-size:clamp(20px,6vw,30px);color:var(--gold);letter-spacing:3px;margin-bottom:16px;}
-.end-text{font-size:clamp(13px,3.8vw,16px);color:#9a7848;line-height:1.7;max-width:340px;font-style:italic;margin-bottom:20px;}
-.end-rewards-box{
-  background:#0e0802;border:1px solid #2a1808;border-radius:3px;
-  padding:12px 18px;width:100%;max-width:300px;margin-bottom:20px;
-}
-.end-rewards-title{font-family:'MedievalSharp',serif;font-size:9px;color:#4a2a08;letter-spacing:4px;margin-bottom:8px;}
-.end-reward{font-size:13px;color:#a07838;margin-bottom:3px;}
-.end-restart{
-  font-family:'MedievalSharp',serif;font-size:11px;color:#3a2008;
-  border:1px solid #2a1808;border-radius:2px;padding:12px 28px;
-  cursor:pointer;letter-spacing:3px;text-transform:uppercase;
-}
-.end-restart:active{color:var(--gold);border-color:#6a3a10;}
+
+/* ── TITLE ── */
+#title-sc{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 60%,#1a0e04,#060302);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:env(safe-area-inset-top,16px) 20px 20px;z-index:200;}
+.t-r{font-size:clamp(40px,10vw,60px);margin-top:10px;filter:drop-shadow(0 0 20px rgba(200,146,42,.6));}
+.t-m{font-size:clamp(28px,8vw,48px);color:#c8922a;letter-spacing:5px;text-shadow:0 0 40px rgba(200,146,42,.5),0 3px 0 #3a1a00;margin:4px 0 2px;}
+.t-s{font-size:9px;color:#4a2a10;letter-spacing:9px;margin-bottom:14px;}
+.t-dv{width:100%;max-width:340px;height:1px;background:linear-gradient(90deg,transparent,#4a2e10,transparent);margin:4px 0 14px;}
+.t-lo{font-size:clamp(12px,3.5vw,15px);color:#7a5830;text-align:center;max-width:330px;line-height:1.75;margin-bottom:18px;font-style:italic;}
+.t-pl{font-size:9px;color:#3a2008;letter-spacing:5px;margin-bottom:12px;}
+.pc{width:100%;max-width:360px;background:linear-gradient(145deg,#120c04,#0e0804);border:1px solid #3a2410;border-radius:3px;padding:13px 15px;margin-bottom:8px;cursor:pointer;display:grid;grid-template-columns:50px 1fr;gap:11px;align-items:center;transition:border-color .2s;position:relative;overflow:hidden;}
+.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c);box-shadow:0 0 10px var(--c);}
+.pc:active{border-color:var(--c);transform:scale(.99);}
+.pc-ic{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,rgba(var(--cr),.12),transparent);border:1px solid rgba(var(--cr),.25);display:flex;align-items:center;justify-content:center;font-size:24px;}
+.pc-n{font-size:clamp(13px,4vw,16px);color:var(--c);margin-bottom:2px;}
+.pc-d{font-size:clamp(10px,2.8vw,12px);color:#4a3010;line-height:1.35;margin-bottom:4px;}
+.pc-tg{display:flex;gap:4px;flex-wrap:wrap;}
+.pc-tag{font-size:8px;color:var(--c);border:1px solid var(--c);border-radius:1px;padding:1px 4px;opacity:.45;letter-spacing:1px;text-transform:uppercase;}
+
+/* ── ENDING ── */
+#end{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 40%,#140a02,#060300);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;text-align:center;overflow-y:auto;}
+.e-ic{font-size:60px;margin-bottom:14px;animation:glow2 2s infinite;}
+@keyframes glow2{0%,100%{filter:drop-shadow(0 0 6px rgba(200,146,42,.4));}50%{filter:drop-shadow(0 0 24px rgba(200,146,42,.8));}}
+.e-ch{font-size:9px;color:#4a2a08;letter-spacing:6px;text-transform:uppercase;margin-bottom:4px;}
+.e-t{font-size:clamp(18px,6vw,28px);color:#c8922a;letter-spacing:3px;margin-bottom:12px;}
+.e-tx{font-size:clamp(12px,3.5vw,15px);color:#9a7848;line-height:1.7;max-width:340px;margin-bottom:16px;}
+.e-rw{background:#0e0802;border:1px solid #2a1808;border-radius:3px;padding:12px 18px;width:100%;max-width:300px;margin-bottom:16px;}
+.e-rwt{font-size:8px;color:#3a2008;letter-spacing:4px;margin-bottom:7px;}
+.e-r{font-size:12px;color:#9a7030;margin-bottom:3px;}
+.e-btn{font-size:10px;color:#3a1a08;border:1px solid #2a1808;border-radius:2px;padding:11px 26px;cursor:pointer;letter-spacing:3px;text-transform:uppercase;}
+.e-btn:active{color:#c8922a;border-color:#6a3810;}
 </style>
 </head>
 <body>
- 
-<!-- ═══ TITLE ═══ -->
-<div id="title-screen">
-  <div class="title-rune">⚔</div>
-  <div class="title-main">GOTHIC</div>
-  <div class="title-sub">За барьером · 2026</div>
-  <div class="title-divider"></div>
-  <div class="title-lore">Ты попал за магический барьер. Лагерь угольной ямы — живой организм из страха, жадности и тайн. Шахта зовёт всех. Не все возвращаются.</div>
-  <div class="paths-title">— Выбери путь —</div>
- 
-  <div class="path-card" style="--c:#e05050;--cr:224,80,80" onclick="chooseStory('power')">
-    <div class="path-icon">⚔️</div>
-    <div>
-      <div class="path-name">Кровь и Власть</div>
-      <div class="path-desc">Лиард правит через страх. Помоги ему — или уничтожь. Лагерь станет твоим.</div>
-      <div class="path-tags"><span class="path-tag">Предательство</span><span class="path-tag">Насилие</span><span class="path-tag">Интрига</span></div>
-    </div>
+
+<!-- TITLE -->
+<div id="title-sc">
+  <div class="t-r">⚔</div>
+  <div class="t-m">GOTHIC</div>
+  <div class="t-s">FPS · ЗА БАРЬЕРОМ</div>
+  <div class="t-dv"></div>
+  <div class="t-lo">Ты внутри барьера. От первого лица. Лагерь, шахта, враги, выборы. Выживи — или найди правду.</div>
+  <div class="t-pl">— Выбери путь —</div>
+  <div class="pc" style="--c:#e05050;--cr:224,80,80" onclick="startGame('power')">
+    <div class="pc-ic">⚔️</div>
+    <div><div class="pc-n">Кровь и Власть</div><div class="pc-d">Прокладывай путь силой. Враги реальны.</div><div class="pc-tg"><span class="pc-tag">Бой</span><span class="pc-tag">Интрига</span><span class="pc-tag">Сложно</span></div></div>
   </div>
- 
-  <div class="path-card" style="--c:#a060e0;--cr:160,96,224" onclick="chooseStory('arcane')">
-    <div class="path-icon">🔮</div>
-    <div>
-      <div class="path-name">Тайна Барьера</div>
-      <div class="path-desc">Эла — ведьма с секретом. Что скрыто в руинах и шахте — страшнее людей.</div>
-      <div class="path-tags"><span class="path-tag">Магия</span><span class="path-tag">Призраки</span><span class="path-tag">Выбор</span></div>
-    </div>
+  <div class="pc" style="--c:#a060e0;--cr:160,96,224" onclick="startGame('arcane')">
+    <div class="pc-ic">🔮</div>
+    <div><div class="pc-n">Тайна Барьера</div><div class="pc-d">Магия, призраки, руины. Знание — оружие.</div><div class="pc-tg"><span class="pc-tag">Магия</span><span class="pc-tag">Исследование</span><span class="pc-tag">Средне</span></div></div>
   </div>
- 
-  <div class="path-card" style="--c:#40a0e0;--cr:64,160,224" onclick="chooseStory('justice')">
-    <div class="path-icon">⚖️</div>
-    <div>
-      <div class="path-name">Цена Справедливости</div>
-      <div class="path-desc">Ран знает правду. Но правда здесь опасна. Как далеко ты зайдёшь?</div>
-      <div class="path-tags"><span class="path-tag">Честь</span><span class="path-tag">Расследование</span><span class="path-tag">Бунт</span></div>
+  <div class="pc" style="--c:#40a0e0;--cr:64,160,224" onclick="startGame('justice')">
+    <div class="pc-ic">⚖️</div>
+    <div><div class="pc-n">Цена Справедливости</div><div class="pc-d">Расследуй. Собери улики. Подними бунт.</div><div class="pc-tg"><span class="pc-tag">Разведка</span><span class="pc-tag">Диалог</span><span class="pc-tag">Легко</span></div></div>
+  </div>
+</div>
+
+<!-- GAME CANVAS -->
+<canvas id="c"></canvas>
+
+<!-- CROSSHAIR -->
+<div id="crosshair"></div>
+
+<!-- TOP HUD -->
+<div id="top-hud" style="display:none;">
+  <div id="quest-box"><div id="quest-label">Задание</div><div id="quest-text">Исследуй лагерь</div></div>
+  <div id="inv-box"></div>
+</div>
+
+<!-- MINIMAP -->
+<canvas id="minimap" width="90" height="90" style="display:none;"></canvas>
+
+<!-- BOTTOM HUD -->
+<div id="hud" style="display:none;">
+  <div id="hud-bars">
+    <div id="hp-box">
+      <div id="hp-label">Здоровье</div>
+      <div id="hp-bar" style="width:100%"></div>
+      <div id="hp-val">100 / 100</div>
+    </div>
+    <div id="xp-box">
+      <div id="xp-label">Опыт</div>
+      <div id="xp-bar" style="width:0%"></div>
+      <div id="xp-val">0 XP</div>
     </div>
   </div>
 </div>
- 
-<!-- ═══ GAME ═══ -->
-<div id="game-wrap">
-  <canvas id="game-canvas"></canvas>
- 
-  <div id="hud-top">
-    <div id="hud-quest-box">
-      <div id="hud-qt">Задание</div>
-      <div id="hud-qv">Исследуй лагерь</div>
-    </div>
-    <div id="hud-right">
-      <div id="hud-loc">📍 Лагерь</div>
-      <div id="hud-inv"></div>
-    </div>
+
+<!-- INTERACT PROMPT -->
+<div id="center-info"><div id="interact-prompt"></div></div>
+
+<!-- CONTROLS -->
+<div id="controls" style="display:none;">
+  <div id="joystick-area">
+    <div id="joystick-ring"><div id="joystick-dot"></div></div>
   </div>
- 
-  <div id="btn-map" onclick="toggleMap()"><span>🗺</span><span>КАРТА</span></div>
-  <div id="btn-act" onclick="doAction()"><span>💬</span><span>ДЕЙСТВИЕ</span></div>
- 
-  <div id="dlg" onclick="nextLine()">
-    <div id="dlg-box">
-      <div id="dlg-bar"><div id="dlg-bar-fill"></div></div>
-      <div id="dlg-who">
-        <span id="dlg-ico"></span>
-        <span id="dlg-name"></span>
-        <span id="dlg-sep"></span>
-      </div>
-      <div id="dlg-body"></div>
-      <div id="dlg-tap">НАЖМИ ПРОДОЛЖИТЬ ›</div>
-    </div>
-  </div>
- 
-  <div id="toast"></div>
- 
-  <!-- MAP OVERLAY -->
-  <div id="map-overlay">
-    <div id="map-title">🗺 КАРТА ЛАГЕРЯ</div>
-    <div id="map-sub">Выбери локацию</div>
-    <div class="map-grid" id="map-grid"></div>
-    <div id="map-close" onclick="toggleMap()">— ЗАКРЫТЬ —</div>
-  </div>
- 
-  <!-- ENDING -->
-  <div id="ending">
-    <div class="end-icon" id="end-icon"></div>
-    <div class="end-chapter" id="end-chapter"></div>
-    <div class="end-title" id="end-title"></div>
-    <div class="end-text" id="end-text"></div>
-    <div class="end-rewards-box">
-      <div class="end-rewards-title">Получено за путь</div>
-      <div id="end-rewards"></div>
-    </div>
-    <div class="end-restart" onclick="location.reload()">Начать заново</div>
+  <div id="look-area"></div>
+  <div id="btn-sprint" onclick="">🏃</div>
+  <div id="btn-attack" onclick="doAttack()">⚔️</div>
+  <div id="btn-action" onclick="doInteract()"><span class="ba-ico">💬</span><span class="ba-lbl">ДЕЙСТВИЕ</span></div>
+</div>
+
+<!-- DIALOGUE -->
+<div id="dlg">
+  <div id="dlg-box">
+    <div id="dlg-prog"><div id="dlg-fill"></div></div>
+    <div id="dlg-who"><span id="dlg-ico"></span><span id="dlg-nm"></span><span id="dlg-sep"></span></div>
+    <div id="dlg-body"></div>
+    <div id="dlg-hint">НАЖМИ ПРОДОЛЖИТЬ ›</div>
   </div>
 </div>
- 
+
+<!-- CHOICES -->
+<div id="choices">
+  <div id="choices-box">
+    <div id="choices-title">— ВЫБОР —</div>
+    <div id="choices-list"></div>
+  </div>
+</div>
+
+<!-- COMBAT FLASH -->
+<div id="hit-flash"></div>
+<div id="heal-flash"></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ENDING -->
+<div id="end">
+  <div class="e-ic" id="e-ic"></div>
+  <div class="e-ch" id="e-ch"></div>
+  <div class="e-t" id="e-t"></div>
+  <div class="e-tx" id="e-tx"></div>
+  <div class="e-rw"><div class="e-rwt">Получено за путь</div><div id="e-rw-list"></div></div>
+  <div class="e-btn" onclick="location.reload()">Начать заново</div>
+</div>
+
 <script>
-// ══════════════════════════════════════════
-//  TELEGRAM
-// ══════════════════════════════════════════
-if(window.Telegram?.WebApp){
-  const wa=window.Telegram.WebApp;
-  wa.ready();wa.expand();
-  try{wa.setHeaderColor('#0a0806');wa.setBackgroundColor('#0a0806');}catch(e){}
-}
- 
-// ══════════════════════════════════════════
-//  LOCATIONS DATA
-// ══════════════════════════════════════════
-const LOCATIONS = {
+if(window.Telegram?.WebApp){const w=window.Telegram.WebApp;w.ready();w.expand();try{w.setHeaderColor('#000');w.setBackgroundColor('#000');}catch(e){}}
+
+// ══════════════════════════════════════════════════
+//  WORLD MAP DEFINITION
+//  Each zone is a grid of cells:
+//  0=empty  1=wall  2=door(N) 3=door(S) 4=door(E) 5=door(W)
+//  Entities placed separately
+// ══════════════════════════════════════════════════
+const ZONES = {
   camp:{
-    id:'camp', name:'Лагерь', icon:'🏕',
-    desc:'Центр лагеря. Костёр, грязь, страх.',
-    bgColor:'#0e0b06', gridColor:'#1a1408',
-    ambiance:'night_forest',
-    buildings:[
-      {id:'campfire', x:0.5,  y:0.52, w:0.12, h:0.1,  icon:'🔥', label:'Костёр',   color:'#c07018', glow:true},
-      {id:'tavern',   x:0.18, y:0.38, w:0.16, h:0.14, icon:'🍺', label:'Таверна',  color:'#8a4810', portal:'tavern'},
-      {id:'smithy',   x:0.72, y:0.34, w:0.16, h:0.13, icon:'⚒', label:'Кузница', color:'#6a5020', portal:'smithy'},
-      {id:'prison',   x:0.22, y:0.65, w:0.14, h:0.12, icon:'⛓', label:'Тюрьма',   color:'#3a2818', portal:'prison'},
-      {id:'ruins',    x:0.72, y:0.62, w:0.14, h:0.12, icon:'🏛', label:'Руины',    color:'#4a3828', portal:'ruins'},
-      {id:'mine',     x:0.5,  y:0.82, w:0.18, h:0.09, icon:'⛏', label:'Шахта',    color:'#2a1e14', portal:'mine'},
+    name:'Лагерь', w:20, h:20,
+    sky:[0x1a1408,0x0a0806], floor:[0x2a1e10,0x1a1208], wall:[0x5a3818,0x3a2010],
+    fogDist:14,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
+      [1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
+      [1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'liana', x:0.42, y:0.44, name:'ЛИАНА', icon:'👩', color:'#c87838', desc:'Торговка'},
-    ]
+    portals:[
+      {x:3,y:3,zone:'tavern',label:'🍺 Таверна'},
+      {x:15,y:3,zone:'smithy',label:'⚒ Кузница'},
+      {x:3,y:14,zone:'prison',label:'⛓ Тюрьма'},
+      {x:15,y:14,zone:'ruins',label:'🏛 Руины'},
+      {x:9,y:18,zone:'mine',label:'⛏ Шахта (глубже)'},
+    ],
+    entities:[
+      {type:'npc',x:7.5,y:9.5,id:'liana',name:'ЛИАНА',icon:'👩',color:'#e07830',dialogue:'liana'},
+      {type:'npc',x:12.5,y:9.5,id:'korin',name:'КОРИН',icon:'⛏',color:'#c89040',dialogue:'korin'},
+      {type:'item',x:9.5,y:9.5,id:'campfire',icon:'🔥',label:'Костёр',interact:'campfire'},
+      {type:'enemy',x:5,y:16,id:'bandit1',name:'БАНДИТ',hp:30,maxHp:30,dmg:8,xp:25,icon:'💀',color:0xe03030},
+      {type:'enemy',x:16,y:16,id:'bandit2',name:'БАНДИТ',hp:30,maxHp:30,dmg:8,xp:25,icon:'💀',color:0xe03030},
+    ],
+    ambientColor:[0x1a1206],
+    lightColor:[255,180,80],
   },
   tavern:{
-    id:'tavern', name:'Таверна "Мёртвый ворон"', icon:'🍺',
-    desc:'Деревянные стены, запах пота и дыма. Тут узнают всё.',
-    bgColor:'#100804', gridColor:'#180e06',
-    buildings:[
-      {id:'bar',     x:0.5,  y:0.35, w:0.5,  h:0.12, icon:'🍺', label:'Стойка',    color:'#6a3810'},
-      {id:'table1',  x:0.22, y:0.55, w:0.18, h:0.10, icon:'🕯',  label:'Стол у окна',color:'#3a2810'},
-      {id:'table2',  x:0.62, y:0.60, w:0.18, h:0.10, icon:'🎲', label:'Игорный стол',color:'#3a2810'},
-      {id:'cellar',  x:0.18, y:0.78, w:0.14, h:0.09, icon:'🚪', label:'Подвал',    color:'#1a1008', locked:true},
+    name:'Таверна «Мёртвый ворон»', w:14, h:14,
+    sky:[0x120a04,0x080402], floor:[0x2a1808,0x1a0e04], wall:[0x5a3010,0x3a1c08],
+    fogDist:10,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,1,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,1,0,1],
+      [1,0,1,1,0,0,0,0,0,0,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,1,0,1],
+      [1,0,1,1,0,0,0,0,0,0,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'barkeep', x:0.5,  y:0.27, name:'ГАНС',   icon:'🧔', color:'#a06030', desc:'Хозяин'},
-      {id:'drunk',   x:0.22, y:0.60, name:'ПЬЯНИЦА', icon:'🥴', color:'#6a4020', desc:'Заключённый'},
-      {id:'gambler', x:0.68, y:0.65, name:'КАРТОЧНИК',icon:'🎭',color:'#8a5028', desc:'Мошенник'},
+    portals:[{x:6,y:12,zone:'camp',label:'🚪 Выход в лагерь'}],
+    entities:[
+      {type:'npc',x:6.5,y:2.5,id:'barkeep',name:'ГАНС',icon:'🧔',color:'#c07030',dialogue:'barkeep'},
+      {type:'npc',x:2.5,y:9.5,id:'drunk',name:'ПЬЯНИЦА',icon:'🥴',color:'#806030',dialogue:'drunk'},
+      {type:'npc',x:11.5,y:9.5,id:'gambler',name:'КАРТОЧНИК',icon:'🎭',color:'#9a5028',dialogue:'gambler'},
+      {type:'item',x:6.5,y:6.5,id:'card_table',icon:'🎲',label:'Игорный стол',interact:'gamble'},
+      {type:'enemy',x:3.5,y:5.5,id:'thug',name:'ГОЛОВОРЕЗ',hp:40,maxHp:40,dmg:12,xp:40,icon:'🗡',color:0xc02020},
     ],
-    exitTo:'camp'
   },
   smithy:{
-    id:'smithy', name:'Кузница Торга', icon:'⚒',
-    desc:'Жар горна, звон металла. Здесь куют и ломают.',
-    bgColor:'#120a04', gridColor:'#1e1006',
-    buildings:[
-      {id:'forge',   x:0.5,  y:0.3,  w:0.22, h:0.16, icon:'🔥', label:'Горн',       color:'#c05010', glow:true},
-      {id:'anvil',   x:0.28, y:0.52, w:0.14, h:0.10, icon:'⚒',  label:'Наковальня', color:'#4a4030'},
-      {id:'chest',   x:0.72, y:0.55, w:0.12, h:0.10, icon:'📦', label:'Ящик с инструментами',color:'#3a2810'},
-      {id:'rack',    x:0.5,  y:0.70, w:0.2,  h:0.08, icon:'🗡',  label:'Стойка оружия',color:'#3a3020'},
+    name:'Кузница Торга', w:12, h:12,
+    sky:[0x1a0e04,0x100804], floor:[0x281808,0x181006], wall:[0x6a4a10,0x3a2808],
+    fogDist:8,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,0,0,0,0,0,0,0,1],
+      [1,0,1,1,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,1,1,0,0,1],
+      [1,0,0,0,0,0,0,1,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'torg',   x:0.5,  y:0.22, name:'ТОРГ',     icon:'👨‍🏭',color:'#e07030', desc:'Кузнец'},
-      {id:'helper', x:0.22, y:0.55, name:'ПОМОЩНИК', icon:'👦', color:'#7a5030', desc:'Ученик'},
+    portals:[{x:5,y:10,zone:'camp',label:'🚪 Выход'}],
+    entities:[
+      {type:'npc',x:5.5,y:1.5,id:'torg',name:'ТОРГ',icon:'👨‍🏭',color:'#e07030',dialogue:'torg'},
+      {type:'npc',x:1.5,y:5.5,id:'helper',name:'ПОМОЩНИК',icon:'👦',color:'#7a5030',dialogue:'helper'},
+      {type:'item',x:2.5,y:2.5,id:'forge',icon:'🔥',label:'Горн',interact:'forge'},
+      {type:'item',x:5.5,y:5.5,id:'anvil',icon:'⚒',label:'Наковальня',interact:'anvil'},
+      {type:'item',x:8.5,y:8.5,id:'weapon_rack',icon:'🗡',label:'Стойка оружия',interact:'weapon_rack'},
+      {type:'enemy',x:9.5,y:2,id:'guard_smith',name:'ОХРАННИК',hp:50,maxHp:50,dmg:14,xp:50,icon:'💂',color:0x4060c0},
     ],
-    exitTo:'camp'
   },
   prison:{
-    id:'prison', name:'Тюрьма', icon:'⛓',
-    desc:'Камеры, решётки, стоны. Сюда не попадают по ошибке.',
-    bgColor:'#080606', gridColor:'#120808',
-    buildings:[
-      {id:'cell1',  x:0.2,  y:0.35, w:0.22, h:0.18, icon:'⛓', label:'Камера 1',  color:'#1a1010'},
-      {id:'cell2',  x:0.6,  y:0.35, w:0.22, h:0.18, icon:'⛓', label:'Камера 2',  color:'#1a1010'},
-      {id:'cell3',  x:0.2,  y:0.62, w:0.22, h:0.18, icon:'⛓', label:'Камера 3',  color:'#1a1010'},
-      {id:'guard_post',x:0.62,y:0.68,w:0.2, h:0.12, icon:'💂', label:'Пост охраны',color:'#2a1808'},
+    name:'Тюрьма', w:16, h:16,
+    sky:[0x080608,0x040204], floor:[0x120c0c,0x0a0808], wall:[0x2a1a18,0x1a1210],
+    fogDist:9,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,1,1,1,0,1],
+      [1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1],
+      [1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,1,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'prisoner1', x:0.2,  y:0.38, name:'МИРКО',  icon:'😔', color:'#6a4020', desc:'Узник'},
-      {id:'prisoner2', x:0.6,  y:0.38, name:'ЭДА',    icon:'😢', color:'#8a5030', desc:'Узница'},
-      {id:'guard',     x:0.68, y:0.72, name:'СТРАЖНИК',icon:'💂',color:'#4060a0', desc:'Охранник'},
+    portals:[{x:7,y:14,zone:'camp',label:'🚪 Выход'}],
+    entities:[
+      {type:'npc',x:3,y:3.5,id:'mirko',name:'МИРКО',icon:'😔',color:'#7a5030',dialogue:'mirko'},
+      {type:'npc',x:12,y:3.5,id:'eda',name:'ЭДА',icon:'😢',color:'#9a5030',dialogue:'eda'},
+      {type:'npc',x:7.5,y:8.5,id:'guard_prison',name:'СТРАЖНИК',icon:'💂',color:'#5060a0',dialogue:'guard_prison'},
+      {type:'item',x:2.5,y:13,id:'loose_brick',icon:'🧱',label:'Шатающийся кирпич',interact:'loose_brick'},
+      {type:'enemy',x:13,y:12,id:'warden',name:'НАДЗИРАТЕЛЬ',hp:60,maxHp:60,dmg:15,xp:60,icon:'👮',color:0x4050a0},
+      {type:'enemy',x:3,y:11,id:'rat1',name:'ОГРОМНАЯ КРЫСА',hp:15,maxHp:15,dmg:5,xp:10,icon:'🐀',color:0x6a4020},
     ],
-    exitTo:'camp'
   },
   ruins:{
-    id:'ruins', name:'Руины Старого Форта', icon:'🏛',
-    desc:'Остатки крепости до барьера. Здесь помнит камень.',
-    bgColor:'#0a0c0a', gridColor:'#121410',
-    buildings:[
-      {id:'altar',  x:0.5,  y:0.28, w:0.2,  h:0.14, icon:'🔮', label:'Древний алтарь', color:'#3a2a5a', glow:true},
-      {id:'tower',  x:0.18, y:0.38, w:0.14, h:0.22, icon:'🏰', label:'Башня',          color:'#2a3020'},
-      {id:'crypt',  x:0.72, y:0.52, w:0.16, h:0.16, icon:'💀', label:'Крипта',         color:'#1a1a14', locked:true},
-      {id:'well',   x:0.3,  y:0.65, w:0.12, h:0.12, icon:'🕳',  label:'Бездонный колодец',color:'#0a0a08'},
-      {id:'stone',  x:0.62, y:0.68, w:0.14, h:0.10, icon:'🪨', label:'Руны на камне',  color:'#2a2a20'},
+    name:'Руины Форта', w:18, h:18,
+    sky:[0x0a0e0a,0x040604], floor:[0x1a1e10,0x100e08], wall:[0x3a3820,0x252015],
+    fogDist:12,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'ela',    x:0.5,  y:0.22, name:'ЭЛА',     icon:'🧙‍♀️',color:'#a060e0', desc:'Ведьма'},
-      {id:'spirit', x:0.18, y:0.42, name:'ДУХ',     icon:'👻', color:'#80b0e0', desc:'Призрак'},
+    portals:[{x:8,y:16,zone:'camp',label:'🚪 Выход'}],
+    entities:[
+      {type:'npc',x:8.5,y:8.5,id:'ela',name:'ЭЛА',icon:'🧙‍♀️',color:'#a040e0',dialogue:'ela'},
+      {type:'npc',x:3.5,y:4,id:'spirit',name:'ДУХ',icon:'👻',color:'#80a0e0',dialogue:'spirit'},
+      {type:'npc',x:14.5,y:13,id:'ran',name:'РАН',icon:'🛡️',color:'#4080d0',dialogue:'ran'},
+      {type:'item',x:8.5,y:7.5,id:'altar',icon:'🔮',label:'Древний алтарь',interact:'altar'},
+      {type:'item',x:14,y:4,id:'rune_stone',icon:'🪨',label:'Руны',interact:'rune_stone'},
+      {type:'item',x:3.5,y:14,id:'old_chest',icon:'📦',label:'Старый сундук',interact:'old_chest'},
+      {type:'enemy',x:11,y:4,id:'undead1',name:'МЕРТВЕЦ',hp:45,maxHp:45,dmg:12,xp:45,icon:'🧟',color:0x60a040},
+      {type:'enemy',x:5,y:14,id:'undead2',name:'МЕРТВЕЦ',hp:45,maxHp:45,dmg:12,xp:45,icon:'🧟',color:0x60a040},
     ],
-    exitTo:'camp'
   },
   mine:{
-    id:'mine', name:'Шахта', icon:'⛏',
-    desc:'Темнота, стоны, шёпот. Что-то здесь живёт.',
-    bgColor:'#060402', gridColor:'#0e0a06',
-    buildings:[
-      {id:'shaft1', x:0.25, y:0.35, w:0.16, h:0.20, icon:'🕳',  label:'Первый уровень',  color:'#1a1208'},
-      {id:'shaft2', x:0.6,  y:0.42, w:0.16, h:0.18, icon:'🕳',  label:'Второй уровень',  color:'#120e08', locked:true},
-      {id:'ore1',   x:0.42, y:0.55, w:0.14, h:0.10, icon:'💎', label:'Жила руды',        color:'#1a2030'},
-      {id:'altar',  x:0.7,  y:0.65, w:0.14, h:0.12, icon:'🔵', label:'Светящийся алтарь',color:'#0a1830', glow:true},
-      {id:'bones',  x:0.25, y:0.68, w:0.12, h:0.08, icon:'💀', label:'Останки',          color:'#1a1408'},
+    name:'Шахта', w:16, h:20,
+    sky:[0x060402,0x030201], floor:[0x100c06,0x080602], wall:[0x2a1e14,0x1a1208],
+    fogDist:7,
+    map:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1],
+      [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
-    npcs:[
-      {id:'miner',    x:0.28, y:0.38, name:'ШАХТЁР',    icon:'👷', color:'#8a5828', desc:'Живой'},
-      {id:'stranger', x:0.65, y:0.45, name:'ТЕНЬ',       icon:'🌑', color:'#4040a0', desc:'???'},
+    portals:[{x:7,y:1,zone:'camp',label:'▲ Выход'}],
+    entities:[
+      {type:'npc',x:7.5,y:9.5,id:'mine_spirit',name:'ДУХ ШАХТЫ',icon:'💀',color:'#6040c0',dialogue:'mine_spirit'},
+      {type:'npc',x:3.5,y:3.5,id:'miner_alive',name:'ШАХТЁР',icon:'👷',color:'#8a5828',dialogue:'miner'},
+      {type:'item',x:11.5,y:9.5,id:'black_ore',icon:'💎',label:'Чёрная руда',interact:'black_ore'},
+      {type:'item',x:7.5,y:16.5,id:'magic_notes',icon:'📝',label:'Записки мага',interact:'magic_notes'},
+      {type:'item',x:3.5,y:16.5,id:'liard_letter',icon:'📜',label:'Письмо Лиарда',interact:'liard_letter'},
+      {type:'enemy',x:12,y:3,id:'cave_creature',name:'ТВАРЬ ИЗ ЯМЫ',hp:70,maxHp:70,dmg:18,xp:80,icon:'👾',color:0x4060c0},
+      {type:'enemy',x:12,y:16,id:'cave_creature2',name:'ТВАРЬ ИЗ ЯМЫ',hp:70,maxHp:70,dmg:18,xp:80,icon:'👾',color:0x4060c0},
+      {type:'enemy',x:7.5,y:6,id:'mine_undead',name:'МЕРТВЕЦ ШАХТЫ',hp:55,maxHp:55,dmg:15,xp:60,icon:'🧟',color:0x4080a0},
     ],
-    exitTo:'camp'
   }
 };
- 
-// ══════════════════════════════════════════
-//  STORY SCRIPTS
-// ══════════════════════════════════════════
-const SCRIPTS = {
+
+// ══════════════════════════════════════════════════
+//  STORY / QUEST DATA
+// ══════════════════════════════════════════════════
+const STORIES={
   power:{
-    name:'Кровь и Власть', color:'#e05050',
-    startLoc:'tavern', startNpc:'barkeep',
-    questText: {
-      0:'Поговори с хозяином таверны',
-      1:'Найди Торга в кузнице',
-      2:'Посети тюрьму — поговори с Миркой',
-      3:'Спустись в шахту — найди алтарь',
-      4:'Вернись к Лиане в лагерь',
-      5:'ЗАВЕРШЕНО'
-    },
-    endings:{
-      power:{icon:'⚔️',chapter:'Глава 5 — Трон из пепла',title:'ПРАВИТЕЛЬ ЛАГЕРЯ',
-        text:'Лиард мёртв. Лагерь твой. Барьер держится — пока. Ты сидишь у костра, и люди обходят тебя стороной. Вот цена власти.',
-        rewards:['👑 Корона Лагеря','⚔️ Меч Лиарда','💰 Запасы провизии','😨 Страх людей']},
-      betrayal:{icon:'🗡️',chapter:'Глава 5 — Предатель',title:'ИНСТРУМЕНТ ЛИАРДА',
-        text:'Ты сделал всё, что он просил. Теперь он благодарит тебя... пока ты нужен. Такова цена молчания.',
-        rewards:['🏆 Доверие Лиарда','🗝 Ключ от склада','⛓ Власть над узниками','💀 Совесть (утрачена)']}
-    }
+    name:'Кровь и Власть',color:'#e05050',
+    quest:{0:'Поговори с Гансом в таверне',1:'Найди Торга в кузнице',2:'Поговори с Мирко в тюрьме',3:'Найди письмо в шахте',4:'Вернись к Лиане в лагере',5:'✓ Завершено'},
+    endStage:5,
+    ending:{icon:'⚔️',ch:'Глава 5 — Трон из пепла',title:'ПРАВИТЕЛЬ ЛАГЕРЯ',text:'Лиард мёртв. Лагерь твой. Барьер трещит. Ты сидишь у костра — и люди обходят стороной.',rewards:['👑 Корона лагеря','⚔️ Меч Лиарда','💀 Совесть (утрачена)','😨 Страх всех']}
   },
   arcane:{
-    name:'Тайна Барьера', color:'#a060e0',
-    startLoc:'ruins', startNpc:'ela',
-    questText:{
-      0:'Найди Элу в руинах',
-      1:'Поговори с Духом у башни',
-      2:'Найди записки в Шахте',
-      3:'Расшифруй руны в руинах',
-      4:'Поговори с Гансом в таверне',
-      5:'ЗАВЕРШЕНО'
-    },
-    endings:{
-      reveal:{icon:'🔮',chapter:'Эпилог — Печать',title:'ХРАНИТЕЛЬ ТАЙНЫ',
-        text:'Барьер — это не тюрьма. Внутри заключено нечто древнее. Теперь ты знаешь. Это и сила, и смертный приговор.',
-        rewards:['📜 Текст Печати','🔮 Кристалл Элы','👻 Слово призрака','⚡ Осколок барьера']},
-      destroy:{icon:'💥',chapter:'Эпилог — Разрыв',title:'РАЗРУШИТЕЛЬ',
-        text:'Ты сломал алтарь. Барьер трещит. Что-то снаружи... движется. Ты не знаешь, что ты выпустил.',
-        rewards:['💥 Обломок алтаря','🌑 Тьма снаружи','❓ Неизвестное существо','😱 Ужас лагеря']}
-    }
+    name:'Тайна Барьера',color:'#a060e0',
+    quest:{0:'Найди Элу в руинах',1:'Поговори с Духом',2:'Найди записки в шахте',3:'Расшифруй руны в руинах',4:'Вернись к Эле',5:'✓ Завершено'},
+    endStage:5,
+    ending:{icon:'🔮',ch:'Эпилог — Печать',title:'ХРАНИТЕЛЬ ТАЙНЫ',text:'Барьер — это не тюрьма. Внутри заключено нечто древнее. Ты знаешь правду. Это сила и смерть.',rewards:['📜 Текст Печати','🔮 Кристалл Элы','👻 Слово призрака','⚡ Осколок барьера']}
   },
   justice:{
-    name:'Цена Справедливости', color:'#40a0e0',
-    startLoc:'prison', startNpc:'prisoner1',
-    questText:{
-      0:'Поговори с Мирко в тюрьме',
-      1:'Поговори с Эдой',
-      2:'Найди улики в кузнице',
-      3:'Поговори с Раном в руинах',
-      4:'Вернись с письмом',
-      5:'ЗАВЕРШЕНО'
-    },
-    endings:{
-      justice:{icon:'⚖️',chapter:'Финал — Приговор',title:'СВИДЕТЕЛЬ',
-        text:'Письма отправлены. Ран поднял мятеж. Лагерь разделился. Часть людей уйдёт — если барьер позволит.',
-        rewards:['📜 Донесение королю','⚖️ Слово Рана','🔓 Свобода Мирко','🕊 Надежда']},
-      silence:{icon:'🤐',chapter:'Финал — Молчание',title:'НЕМОЙ СВИДЕТЕЛЬ',
-        text:'Ты знал. Ты видел. Ты промолчал. Мирко остался в камере. Ты остался жить. Это честная цена?',
-        rewards:['😶 Молчание','🗝 Ключ от камеры (не использован)','💸 Взятка Лиарда','🪞 Отражение в лужах']}
+    name:'Цена Справедливости',color:'#40a0e0',
+    quest:{0:'Поговори с Мирко в тюрьме',1:'Поговори с Эдой',2:'Найди список в кузнице',3:'Найди Рана в руинах',4:'✓ Завершено'},
+    endStage:4,
+    ending:{icon:'⚖️',ch:'Финал — Приговор',title:'СВИДЕТЕЛЬ ПРАВДЫ',text:'Письма отправлены. Ран поднял мятеж. Мирко свободен. Цена — твоя безопасность.',rewards:['📜 Донесение королю','⚖️ Слово Рана','🔓 Свобода Мирко','🕊 Надежда']}
+  }
+};
+
+// NPC dialogues with choices
+const DIALOGUES={
+  liana:{lines:[{s:'ЛИАНА',i:'👩',c:'#c87838',t:'Новенький. Говорят, ты умный. Умные здесь долго не живут.'},{s:'ЛИАНА',i:'👩',c:'#c87838',t:'Если хочешь выжить — начни с таверны. Ганс знает всех и всё.'}]},
+  korin:{lines:[{s:'КОРИН',i:'⛏',c:'#c89040',t:'В шахте что-то поёт. По ночам. Трое пошли проверить — не вернулись.'},{s:'КОРИН',i:'⛏',c:'#c89040',t:'Если не боишься — иди. Но сначала найди оружие.'}]},
+  campfire:{lines:[{s:'КОСТЁР',i:'🔥',c:'#c07018',t:'Огонь потрескивает. Слабое тепло. Ты немного восстанавливаешься.'},{s:'★',i:'💚',c:'#40c040',t:'+20 HP восстановлено.'}],onEnd:()=>heal(20)},
+  gamble:{lines:[{s:'СТОЛ',i:'🎲',c:'#9a5028',t:'Потрёпанные карты. Кто-то проиграл здесь много.'}]},
+  forge:{lines:[{s:'ГОРН',i:'🔥',c:'#e05010',t:'Жар обжигает лицо. Металл раскалён до бела.'}]},
+  anvil:{
+    lines:[{s:'НАКОВАЛЬНЯ',i:'⚒',c:'#808080',t:'Тяжёлая наковальня. Что-то спрятано под ней...'}],
+    choice:{
+      title:'Что делать?',
+      options:[
+        {text:'Поднять наковальню',outcome:'list_found',storyFilter:['justice']},
+        {text:'Осмотреть инструменты',outcome:'tools_inspect'},
+        {text:'Уйти',outcome:null}
+      ]
     }
-  }
-};
- 
-// NPC dialogues keyed by storyId_npcId
-const DIALOGUES = {
-  // ── POWER ──────────────────────────────
-  power_barkeep_0:[
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'О, свежак. Давно не видел новых лиц. Обычно тут только старые долги.'},
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Лиард правит лагерем уже три года. Знаешь, как он это делает? Страх и информация.'},
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Если хочешь выжить — тебе нужны союзники. Торг в кузнице. Начни с него.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Найди кузнеца Торга в кузнице.'}
-  ],
-  power_barkeep_1:[{spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Торг в кузнице. Он знает о Лиарде больше, чем говорит.'}],
-  power_barkeep_2:[{spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Мирко говорит правду. Жаль, что правда тут ничего не стоит.'}],
-  power_barkeep_after:[{spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'...Ты знаешь слишком много. Это опасно.'}],
-  power_drunk_any:[
-    {spk:'ПЬЯНИЦА',ico:'🥴',c:'#805040',txt:'...Лиард... он убил Перека. За одно слово. Одно слово не в то ухо...'},
-    {spk:'ПЬЯНИЦА',ico:'🥴',c:'#805040',txt:'Я ничего не говорил. Забудь. Я пьяный.'}
-  ],
-  power_gambler_any:[
-    {spk:'КАРТОЧНИК',ico:'🎭',c:'#905828',txt:'Сыграем? Нет? Ладно. Тогда просто совет: доверяй картам больше, чем людям.'},
-    {spk:'КАРТОЧНИК',ico:'🎭',c:'#905828',txt:'Лиард проигрывает одну партию. Большую. Это всё, что скажу.'}
-  ],
-  power_torg_1:[
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Кто послал? Ганс? Значит, проверенный.'},
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Лиард хочет больше руды. Но там внизу что-то происходит. Люди слышат пение.'},
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Если хочешь против него — тебе нужны свидетели. Тюрьма полна ими.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Поговори с узниками в тюрьме.'}
-  ],
-  power_torg_after:[{spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Кузница открыта. Оружие по соглашению.'}],
-  power_helper_any:[
-    {spk:'ПОМОЩНИК',ico:'👦',c:'#7a5030',txt:'Торг хороший. Лиард платит ему мало, поэтому он злой. Но хороший.'}
-  ],
-  power_prisoner1_2:[
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Ты пришёл помочь? Или смотреть?'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Нас здесь пятеро. Без вины. Лиард сказал — долги. Каких долгов?'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Есть письмо. Он написал его магу из столицы. Я видел печать — чёрный ворон.'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Письмо где-то в шахте. Он прячет там самое важное.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Найди письмо Лиарда в шахте.'}
-  ],
-  power_prisoner2_2:[
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Я видела как он убил Перека. Собственными руками.'},
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Если ты выйдешь — расскажи кому-нибудь. Пожалуйста.'}
-  ],
-  power_guard_any:[
-    {spk:'СТРАЖНИК',ico:'💂',c:'#5070a0',txt:'Не твоё дело. Иди.'},
-    {spk:'СТРАЖНИК',ico:'💂',c:'#5070a0',txt:'...Хорошо. Тихо. Я устал здесь стоять, и мне не платят достаточно для молчания.'}
-  ],
-  power_miner_3:[
-    {spk:'ШАХТЁР',ico:'👷',c:'#8a5828',txt:'Стой. Ты за Лиарда или нет?'},
-    {spk:'ШАХТЁР',ico:'👷',c:'#8a5828',txt:'...Алтарь там, в глубине. Он светится. Лиард хочет активировать его.'},
-    {spk:'ШАХТЁР',ico:'👷',c:'#8a5828',txt:'Не знаю что будет. Но трое ушли туда и не вернулись.'}
-  ],
-  power_stranger_3:[
-    {spk:'ТЕНЬ',ico:'🌑',c:'#6060c0',txt:'...ты нашёл письмо...'},
-    {spk:'ТЕНЬ',ico:'🌑',c:'#6060c0',txt:'...хорошо. очень хорошо. теперь ты знаешь достаточно...'},
-    {spk:'ТЕНЬ',ico:'🌑',c:'#6060c0',txt:'...сделай выбор. передай Лиарду — или уничтожь. у тебя один шанс...'}
-  ],
-  power_liana_4:[
-    {spk:'ЛИАНА',ico:'👩',c:'#c87838',txt:'Ты нашёл письмо? Я знала, что ты справишься.'},
-    {spk:'ЛИАНА',ico:'👩',c:'#c87838',txt:'Лиард будет здесь через час. Если отдашь ему — получишь место рядом.'},
-    {spk:'ЛИАНА',ico:'👩',c:'#c87838',txt:'Если уничтожишь — он тебя убьёт. Или нет. Зависит от того, насколько ты умён.'},
-    {spk:'★ ВЫБОР',ico:'⚔️',c:'#e05050',txt:'Твой путь завершён. Выбор сделан.'}
-  ],
- 
-  // ── ARCANE ─────────────────────────────
-  arcane_ela_0:[
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'О. Живой. Значит, лагерь ещё не сожрал тебя.'},
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Я здесь уже два года. Изучаю барьер. Он живой — понимаешь? Он дышит.'},
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Мне нужен помощник. Без предрассудков. Поговори с Духом у башни.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Найди Духа у башни в руинах.'}
-  ],
-  arcane_ela_2:[
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Дух говорил? Хорошо. В шахте есть записки. Маг написал их перед исчезновением.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Найди записки мага в шахте.'}
-  ],
-  arcane_ela_3:[
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Записки у тебя? Дай сюда... вот оно.'},
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Барьер — это древняя печать. Внутри что-то заключено. Лагерь — случайность.'},
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Руны на камне покажут символ печати. Расшифруй их — потом поговори с Гансом.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Прочти руны на камне. Найди Ганса в таверне.'}
-  ],
-  arcane_ela_4:[
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Ганс тоже знает? Значит, тайна шире, чем я думала.'},
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Теперь выбор за тобой. Сохранить — или разрушить.'},
-    {spk:'★ ВЫБОР',ico:'🔮',c:'#a060e0',txt:'Путь тайны завершён.'}
-  ],
-  arcane_spirit_1:[
-    {spk:'ДУХ',ico:'👻',c:'#80b0e0',txt:'...ты... живой... как странно...'},
-    {spk:'ДУХ',ico:'👻',c:'#80b0e0',txt:'...нас было пятеро. мы пели с барьером. барьер ответил...'},
-    {spk:'ДУХ',ico:'👻',c:'#80b0e0',txt:'...не трогай алтарь. в нём память о том что было до нас...'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Ищи записки мага — поговори с Элой.'}
-  ],
-  arcane_spirit_after:[
-    {spk:'ДУХ',ico:'👻',c:'#80b0e0',txt:'...помни. что разрушено — не вернуть...'}
-  ],
-  arcane_miner_any:[
-    {spk:'ШАХТЁР',ico:'👷',c:'#8a5828',txt:'Ты слышишь шёпот? Нет? Значит, ещё не слишком долго здесь.'}
-  ],
-  arcane_stranger_any:[
-    {spk:'ТЕНЬ',ico:'🌑',c:'#6060c0',txt:'...ты ищешь правду... будь осторожен... правда здесь имеет зубы...'}
-  ],
-  arcane_barkeep_3:[
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Ты прочёл руны? Значит, ты уже обречён — в хорошем смысле.'},
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'Мой дед строил этот лагерь. Нет — не лагерь. Форт. Сторожевой пост.'},
-    {spk:'ГАНС',ico:'🧔',c:'#c07030',txt:'То, что внутри барьера — оно не злое. Оно просто другое. Иди к Эле.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Вернись к Эле в руинах.'}
-  ],
- 
-  // ── JUSTICE ────────────────────────────
-  justice_prisoner1_0:[
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Снова новое лицо. Вы все одинаково смотрите — как будто мы экспонаты.'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Послушай. Нас здесь держат без суда. Лиард сказал королю, что мы опасны.'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Есть стражник — Ран. Он единственный честный. Но он один.'},
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Поговори с Эдой. У неё есть доказательства. Из камеры номер два.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Поговори с Эдой в камере 2.'}
-  ],
-  justice_prisoner2_1:[
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Ты от Мирко? ...Хорошо.'},
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Перед арестом я работала в кузнице. Слышала разговор Лиарда с кузнецом.'},
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Они обсуждали список. Люди, которых надо убрать. Список спрятан в наковальне.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Найди список в кузнице (наковальня).'}
-  ],
-  justice_prisoner2_after:[
-    {spk:'ЭДА',ico:'😢',c:'#9a6040',txt:'Список в наковальне. Торопись — охрана меняется.'}
-  ],
-  justice_prisoner1_after:[
-    {spk:'МИРКО',ico:'😔',c:'#7a5030',txt:'Ты ещё здесь. Значит, ещё не всё потеряно.'}
-  ],
-  justice_torg_2:[
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Откуда ты знаешь про список?..'},
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'...Я не убивал никого. Я только ковал. Оружие. Не выбирал для кого.'},
-    {spk:'ТОРГ',ico:'👨‍🏭',c:'#e07030',txt:'Список — вот он. Забирай. Только вытащи меня отсюда тоже.'},
-    {spk:'★',ico:'📜',c:'#dcb432',txt:'ЗАДАНИЕ: Список получен. Найди Рана в руинах.'}
-  ],
-  justice_ela_any:[
-    {spk:'ЭЛА',ico:'🧙‍♀️',c:'#a060e0',txt:'Ах, расследование. Благородно. Пустая трата времени, но благородно.'}
-  ],
-  justice_spirit_any:[
-    {spk:'ДУХ',ico:'👻',c:'#80b0e0',txt:'...правда и справедливость... редко живут рядом...'}
-  ],
-  justice_ran_3:[
-    {spk:'РАН',ico:'🛡️',c:'#4080d0',txt:'Кто ты такой? Как ты сюда попал?'},
-    {spk:'РАН',ico:'🛡️',c:'#4080d0',txt:'...Список? Дай сюда. ...Боже. Вот почему на мои доносы нет ответа.'},
-    {spk:'РАН',ico:'🛡️',c:'#4080d0',txt:'Лиард платит курьерам. Письма не доходят. Я был слепым идиотом.'},
-    {spk:'РАН',ico:'🛡️',c:'#4080d0',txt:'Теперь у меня есть доказательства. Но действовать надо быстро. Ты со мной?'},
-    {spk:'★ ВЫБОР',ico:'⚖️',c:'#40a0e0',txt:'Путь справедливости завершён. Твой выбор определит судьбу лагеря.'}
-  ],
-};
- 
-// Items that appear in locations
-const ITEMS = {
-  power:{
-    mine_altar:{locId:'mine',bldId:'altar',name:'📜 Письмо Лиарда',flag:'hasLetter',
-      desc:'Запечатанное письмо с чёрным вороном. Печать уже сломана.',
-      neededStage:3}
   },
-  arcane:{
-    mine_shaft1:{locId:'mine',bldId:'shaft1',name:'📝 Записки мага',flag:'hasNotes',
-      desc:'Мелкие символы. Эла сможет прочесть.',
-      neededStage:2},
-    ruins_stone:{locId:'ruins',bldId:'stone',name:'🔺 Символ печати',flag:'hasRune',
-      desc:'Знак руны скопирован. Ганс должен знать.',
-      neededStage:3}
+  weapon_rack:{
+    lines:[{s:'ОРУЖИЕ',i:'🗡',c:'#a08040',t:'Несколько ржавых клинков. Один выглядит приличнее остальных.'}],
+    choice:{
+      title:'Взять оружие?',
+      options:[
+        {text:'Взять железный меч (+15 атаки)',outcome:'take_sword'},
+        {text:'Взять кинжал (+8 атаки, быстро)',outcome:'take_dagger'},
+        {text:'Оставить',outcome:null}
+      ]
+    }
   },
-  justice:{
-    smithy_anvil:{locId:'smithy',bldId:'anvil',name:'📋 Список Лиарда',flag:'hasList',
-      desc:'Имена. Даты. Суммы. Достаточно для приговора.',
-      neededStage:2}
-  }
+  loose_brick:{lines:[{s:'КИРПИЧ',i:'🧱',c:'#8a6030',t:'За кирпичом — узкий тайник. Там свёрток.'}],onEnd:()=>addItem('🔑 Ключ от камеры'),itemGiven:true},
+  altar:{
+    lines:[{s:'АЛТАРЬ',i:'🔮',c:'#a060e0',t:'Камень пульсирует. Руки начинают гореть при прикосновении.'},{s:'АЛТАРЬ',i:'🔮',c:'#a060e0',t:'Надпись: «Печать держится. Не трогай. Никогда.»'}],
+    choice:{
+      title:'Что делать с алтарём?',
+      options:[
+        {text:'Скопировать символы (для Элы)',outcome:'copy_runes',storyFilter:['arcane']},
+        {text:'Попытаться разбить',outcome:'break_altar'},
+        {text:'Отойти',outcome:null}
+      ]
+    }
+  },
+  rune_stone:{lines:[{s:'РУНЫ',i:'🪨',c:'#60e080',t:'Древние символы. После минуты изучения один знак становится понятен.'},{s:'★',i:'📜',c:'#dcb432',t:'Расшифровано: «То что снаружи — не враг. Оно просто другое.»'}],onEnd:()=>advanceIfStory('arcane',3)},
+  old_chest:{lines:[{s:'СУНДУК',i:'📦',c:'#8a6030',t:'Старый сундук. Заперт. Но замок проржавел — можно выбить.'}],choice:{title:'',options:[{text:'Выбить замок',outcome:'open_chest'},{text:'Уйти',outcome:null}]}},
+  black_ore:{lines:[{s:'РУДА',i:'💎',c:'#4080c0',t:'Руда светится синим. Прикосновение обжигает и одновременно притягивает.'}],onEnd:()=>{addItem('💎 Чёрная руда');advanceIfStory('power',3);}},
+  magic_notes:{lines:[{s:'ЗАПИСКИ',i:'📝',c:'#9060e0',t:'Маг писал торопливо. «Барьер живёт. Внутри — не зло. Не трогайте алтари.»'}],onEnd:()=>{addItem('📝 Записки мага');advanceIfStory('arcane',2);}},
+  liard_letter:{lines:[{s:'ПИСЬМО',i:'📜',c:'#e05050',t:'Печать Лиарда. «Узников поставить на добычу руды. Недовольных — в глубину.»'}],onEnd:()=>{addItem('📜 Письмо Лиарда');advanceIfStory('power',3);}},
+
+  barkeep:{
+    lines:[{s:'ГАНС',i:'🧔',c:'#c07030',t:'О, свежак. Лиард правит три года страхом и информацией.'},{s:'ГАНС',i:'🧔',c:'#c07030',t:'Торг в кузнице. Начни с него — если хочешь узнать правду.'}],
+    onEnd:()=>advanceIfStory('power',0)
+  },
+  drunk:{lines:[{s:'ПЬЯНИЦА',i:'🥴',c:'#806030',t:'...Лиард убил Перека. За одно слово. Я ничего не говорил. Забудь.'}]},
+  gambler_npc:{lines:[{s:'КАРТОЧНИК',i:'🎭',c:'#9a5028',t:'Лиард проигрывает одну большую партию. Это всё, что скажу.'}]},
+  torg:{
+    lines:[{s:'ТОРГ',i:'👨‍🏭',c:'#e07030',t:'Ганс послал? Значит проверенный.'},{s:'ТОРГ',i:'👨‍🏭',c:'#e07030',t:'Лиард хочет руду из шахты. Там пропали три человека. Свидетели в тюрьме.'}],
+    onEnd:()=>advanceIfStory('power',1)
+  },
+  helper:{lines:[{s:'ПОМОЩНИК',i:'👦',c:'#7a5030',t:'Торг хороший. Лиард платит мало — поэтому злой. Но добрый.'}]},
+  mirko:{
+    lines:[{s:'МИРКО',i:'😔',c:'#7a5030',t:'Нас здесь пятеро. Без вины.'},{s:'МИРКО',i:'😔',c:'#7a5030',t:'Есть письмо. Лиард писал магу. Спрятано в шахте. Печать — чёрный ворон.'}],
+    onEnd:()=>{advanceIfStory('power',2);advanceIfStory('justice',0);}
+  },
+  eda:{
+    lines:[{s:'ЭДА',i:'😢',c:'#9a5030',t:'Работала в кузнице. Слышала: Лиард и Торг обсуждали список. Имена, даты.'},{s:'ЭДА',i:'😢',c:'#9a5030',t:'Список спрятан в наковальне кузницы.'}],
+    onEnd:()=>advanceIfStory('justice',1)
+  },
+  guard_prison:{
+    lines:[{s:'СТРАЖНИК',i:'💂',c:'#5070a0',t:'Проходи. Здесь смотреть не на что.'},{s:'СТРАЖНИК',i:'💂',c:'#5070a0',t:'...Слушай, мне не платят за лишние вопросы. Иди своей дорогой.'}]
+  },
+  ela:{
+    lines:[{s:'ЭЛА',i:'🧙‍♀️',c:'#a060e0',t:'О. Живой. Лагерь не сожрал.'},{s:'ЭЛА',i:'🧙‍♀️',c:'#a060e0',t:'Барьер живой. Он дышит. Поговори с Духом у северной стены — и принеси записки из шахты.'}],
+    onEnd:()=>advanceIfStory('arcane',0)
+  },
+  spirit:{
+    lines:[{s:'ДУХ',i:'👻',c:'#80b0e0',t:'...ты живой... странно...'},{s:'ДУХ',i:'👻',c:'#80b0e0',t:'...нас было пятеро. пели с барьером. барьер ответил. мы остались...'},{s:'ДУХ',i:'👻',c:'#80b0e0',t:'...записки мага — в шахте. там же — что-то живёт...'}],
+    onEnd:()=>advanceIfStory('arcane',1)
+  },
+  ran:{
+    lines:[{s:'РАН',i:'🛡️',c:'#4080d0',t:'Ты нашёл список?'},{s:'РАН',i:'🛡️',c:'#4080d0',t:'...Вот почему мои доносы пропадали. Лиард платит курьерам.'},{s:'РАН',i:'🛡️',c:'#4080d0',t:'Теперь у меня есть доказательства. Начинаем.'}],
+    onEnd:()=>advanceIfStory('justice',3)
+  },
+  mine_spirit:{
+    lines:[{s:'ДУХ ШАХТЫ',i:'💀',c:'#6040c0',t:'...ты ищешь правду...'},{s:'ДУХ ШАХТЫ',i:'💀',c:'#6040c0',t:'...руда на севере. письмо на юге. тварь охраняет оба...'},{s:'ДУХ ШАХТЫ',i:'💀',c:'#6040c0',t:'...осторожно. в глубине — не только мертвецы...'}]
+  },
+  miner:{lines:[{s:'ШАХТЁР',i:'👷',c:'#8a5828',t:'Ты слышишь шёпот? Нет? Значит, ещё не слишком долго здесь.'}]},
 };
- 
-// ══════════════════════════════════════════
-//  GAME STATE
-// ══════════════════════════════════════════
-let GS = {
-  story:null, stage:0, flags:{}, items:[],
-  loc:'camp', prevLoc:'camp'
+
+// ══════════════════════════════════════════════════
+//  ENGINE STATE
+// ══════════════════════════════════════════════════
+const SW=Math.min(window.innerWidth,480), SH=window.innerHeight;
+const canvas=document.getElementById('c');
+canvas.width=SW; canvas.height=SH;
+const ctx=canvas.getContext('2d');
+
+let GS={
+  story:null, stage:0, hp:100, maxHp:100, xp:0,
+  items:[], flags:{},
+  zone:'camp',
+  px:9.5, py:9.5, angle:0,
+  weapon:{name:'Кулаки',dmg:10,speed:300},
 };
-let dlgQueue=[], dlgIdx=0, dlgActive=false;
-let toastTmr=null;
-let canvas, ctx;
-let player={x:0, y:0, tx:null, ty:null};
-let animFrame=0, animT=0;
-let nearbyInteractable=null;
-let mapOpen=false;
- 
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-function chooseStory(s){
-  GS.story=s; GS.stage=0; GS.flags={}; GS.items=[];
-  const script=SCRIPTS[s];
-  GS.loc=script.startLoc;
-  document.getElementById('title-screen').style.display='none';
-  document.getElementById('game-wrap').style.display='block';
-  initCanvas();
+let entities={}; // zone-keyed entity states
+let dlgQ=[],dlgI=0,dlgActive=false;
+let choiceActive=false;
+let toastT=null;
+let lastAttack=0;
+let attackAnim=0; // 0..1
+let bobTime=0;
+let joystick={active:false,startX:0,startY:0,dx:0,dy:0};
+let lookTouch={active:false,startX:0,startAngle:0};
+let sprinting=false;
+let frameId=null;
+let currentZoneData=null;
+
+// ══════════════════════════════════════════════════
+//  START
+// ══════════════════════════════════════════════════
+function startGame(story){
+  GS.story=story;
+  document.getElementById('title-sc').style.display='none';
+  document.getElementById('hud').style.display='block';
+  document.getElementById('top-hud').style.display='block';
+  document.getElementById('minimap').style.display='block';
+  document.getElementById('controls').style.display='block';
+  document.getElementById('crosshair').style.display='block';
+
+  // Place player based on story start zone
+  const startZones={power:'tavern',arcane:'ruins',justice:'prison'};
+  loadZone('camp');
+  setTimeout(()=>showToast('📍 '+STORIES[story].name+' — начало'),400);
+  setupControls();
+  requestAnimationFrame(loop);
   updateHUD();
 }
- 
-function initCanvas(){
-  canvas=document.getElementById('game-canvas');
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-  ctx=canvas.getContext('2d');
-  player.x=canvas.width/2; player.y=canvas.height*0.55;
-  canvas.addEventListener('click', onTap);
-  canvas.addEventListener('touchend', e=>{
-    if(dlgActive){nextLine();return;}
-    const t=e.changedTouches[0];
-    onTap({clientX:t.clientX,clientY:t.clientY});
-    e.preventDefault();
-  },{passive:false});
-  requestAnimationFrame(loop);
+
+function loadZone(zoneId){
+  GS.zone=zoneId;
+  currentZoneData=ZONES[zoneId];
+  // Place player at center or near portal
+  const z=currentZoneData;
+  GS.px=z.w/2; GS.py=z.h/2;
+  // Make sure not inside wall
+  for(let tries=0;tries<20;tries++){
+    if(!isWall(GS.px,GS.py)) break;
+    GS.px=1+Math.random()*(z.w-2);
+    GS.py=1+Math.random()*(z.h-2);
+  }
+  // Init entities for zone if not done
+  if(!entities[zoneId]){
+    entities[zoneId]={};
+    z.entities.forEach(e=>{
+      entities[zoneId][e.id]={...e,alive:true,pickedUp:false};
+    });
+  }
+  updateHUD();
+  showToast('📍 '+z.name);
 }
- 
-// ══════════════════════════════════════════
-//  RENDER LOOP
-// ══════════════════════════════════════════
-function loop(ts){
-  animT=ts;
-  animFrame++;
-  movePlayer();
-  render();
-  requestAnimationFrame(loop);
+
+function isWall(x,y){
+  const z=currentZoneData;
+  const ix=Math.floor(x), iy=Math.floor(y);
+  if(ix<0||iy<0||ix>=z.w||iy>=z.h) return true;
+  return z.map[iy][ix]===1;
 }
- 
-function movePlayer(){
-  if(player.tx===null) return;
-  const dx=player.tx-player.x, dy=player.ty-player.y;
-  const dist=Math.sqrt(dx*dx+dy*dy);
-  if(dist<4){player.tx=null;player.ty=null;return;}
-  const spd=Math.min(4.5, dist);
-  player.x+=dx/dist*spd;
-  player.y+=dy/dist*spd;
+
+// ══════════════════════════════════════════════════
+//  RAYCASTER
+// ══════════════════════════════════════════════════
+const FOV=Math.PI/2.4;
+const HALF_FOV=FOV/2;
+const NUM_RAYS=Math.floor(SW*0.75);
+const RAY_STEP=FOV/NUM_RAYS;
+
+function castRay(angle){
+  const z=currentZoneData;
+  let rx=GS.px, ry=GS.py;
+  const cosA=Math.cos(angle), sinA=Math.sin(angle);
+  const maxDist=z.fogDist||14;
+  for(let d=0;d<maxDist;d+=0.04){
+    rx+=cosA*0.04; ry+=sinA*0.04;
+    const ix=Math.floor(rx), iy=Math.floor(ry);
+    if(ix<0||iy<0||ix>=z.w||iy>=z.h) return{dist:d,wallX:0,side:0};
+    if(z.map[iy][ix]===1){
+      const wallXf=rx-ix, wallYf=ry-iy;
+      const side=Math.abs(wallXf-0.5)<Math.abs(wallYf-0.5)?0:1;
+      return{dist:d,wallX:side===0?wallYf:wallXf,side,hit:true};
+    }
+    // Check portal
+    for(const p of z.portals||[]){
+      if(Math.abs(rx-p.x-0.5)<0.5&&Math.abs(ry-p.y-0.5)<0.5) return{dist:d,wallX:0,side:2,portal:p,hit:false};
+    }
+  }
+  return{dist:maxDist,hit:false};
 }
- 
+
+// ══════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════
 function render(){
+  if(!currentZoneData) return;
+  const z=currentZoneData;
   const W=canvas.width, H=canvas.height;
-  const loc=LOCATIONS[GS.loc];
-  ctx.clearRect(0,0,W,H);
- 
-  drawBackground(W,H,loc);
-  drawBuildings(W,H,loc);
-  drawNPCs(W,H,loc);
-  drawPlayer2(W,H);
-  drawProximityUI(W,H,loc);
-}
- 
-function drawBackground(W,H,loc){
-  // Base gradient
-  const grad=ctx.createRadialGradient(W/2,H*0.4,0,W/2,H*0.5,H);
-  const bg=loc.bgColor||'#0e0b06';
-  const bg2=shadeColor(bg,-30);
-  grad.addColorStop(0,bg);
-  grad.addColorStop(1,bg2);
-  ctx.fillStyle=grad;
+  const bob=Math.sin(bobTime*8)*1.5;
+  const attackBob=attackAnim>0?Math.sin(attackAnim*Math.PI)*8:0;
+
+  // Sky
+  const skyGrad=ctx.createLinearGradient(0,0,0,H/2);
+  skyGrad.addColorStop(0,'#'+z.sky[0].toString(16).padStart(6,'0'));
+  skyGrad.addColorStop(1,'#'+z.sky[1].toString(16).padStart(6,'0'));
+  ctx.fillStyle=skyGrad;
+  ctx.fillRect(0,0,W,H/2+bob);
+
+  // Floor
+  const flGrad=ctx.createLinearGradient(0,H/2,0,H);
+  flGrad.addColorStop(0,'#'+z.floor[0].toString(16).padStart(6,'0'));
+  flGrad.addColorStop(1,'#'+z.floor[1].toString(16).padStart(6,'0'));
+  ctx.fillStyle=flGrad;
+  ctx.fillRect(0,H/2+bob,W,H/2-bob);
+
+  // Rays
+  const zBuf=[];
+  for(let i=0;i<NUM_RAYS;i++){
+    const rayAngle=GS.angle-HALF_FOV+i*RAY_STEP;
+    const r=castRay(rayAngle);
+    const corrDist=r.dist*Math.cos(rayAngle-GS.angle);
+    zBuf[i]=corrDist;
+    const wallH=Math.min(H,H/corrDist);
+    const wallTop=H/2-wallH/2+bob;
+    const fog=Math.max(0,1-corrDist/z.fogDist);
+    const wC=z.wall[r.side===1?1:0];
+    const wr=(wC>>16)&0xff, wg=(wC>>8)&0xff, wb=wC&0xff;
+    const r2=Math.floor(wr*fog), g2=Math.floor(wg*fog), b2=Math.floor(wb*fog);
+    const x0=Math.floor(i/NUM_RAYS*W);
+    const x1=Math.floor((i+1)/NUM_RAYS*W);
+    ctx.fillStyle=`rgb(${r2},${g2},${b2})`;
+    ctx.fillRect(x0,wallTop,x1-x0,wallH);
+
+    // Wall details (brick lines)
+    if(fog>0.3){
+      const brickH=Math.max(2,wallH*0.12);
+      const brickY=((ry_screen(wallTop,wallH,r.wallX)*3)%1*wallH)+wallTop;
+      ctx.fillStyle=`rgba(0,0,0,${fog*0.12})`;
+      ctx.fillRect(x0,brickY,x1-x0,1.5);
+    }
+  }
+
+  // Entities (sprites)
+  renderEntities(zBuf, W, H, bob);
+
+  // Weapon hand
+  renderWeapon(W, H, bob+attackBob);
+
+  // Vignette
+  const vig=ctx.createRadialGradient(W/2,H/2,H*0.3,W/2,H/2,H*0.75);
+  vig.addColorStop(0,'rgba(0,0,0,0)');
+  vig.addColorStop(1,'rgba(0,0,0,0.55)');
+  ctx.fillStyle=vig;
   ctx.fillRect(0,0,W,H);
- 
-  // Grid / floor texture
-  const gc=loc.gridColor||'#1a1408';
-  ctx.strokeStyle=gc; ctx.lineWidth=0.5; ctx.globalAlpha=0.5;
-  const gs2=40;
-  for(let x=0;x<W;x+=gs2){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=gs2){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.globalAlpha=1;
- 
-  // Ambient particles (dust/embers)
-  if(loc.id==='smithy'||loc.id==='camp'){
-    for(let i=0;i<6;i++){
-      const px=(Math.sin(animT*0.0007+i*1.3)*0.4+0.5)*W;
-      const py=((animT*0.00015+i*0.17)%1)*H;
-      const alpha=Math.sin(animT*0.002+i)*0.4+0.4;
-      ctx.fillStyle=`rgba(200,100,20,${alpha*0.6})`;
-      ctx.beginPath();ctx.arc(px,py,1.5,0,Math.PI*2);ctx.fill();
-    }
+
+  // Attack flash overlay
+  if(attackAnim>0){
+    ctx.fillStyle=`rgba(200,100,20,${attackAnim*0.15})`;
+    ctx.fillRect(0,0,W,H);
   }
-  if(loc.id==='ruins'||loc.id==='mine'){
-    for(let i=0;i<4;i++){
-      const px=(Math.sin(animT*0.0005+i*2.1)*0.35+0.5)*W;
-      const py=(0.3+Math.sin(animT*0.0003+i)*0.2)*H;
-      const alpha=Math.sin(animT*0.0015+i)*0.3+0.3;
-      ctx.fillStyle=`rgba(80,60,160,${alpha*0.5})`;
-      ctx.beginPath();ctx.arc(px,py,2,0,Math.PI*2);ctx.fill();
-    }
-  }
- 
-  // Location name watermark
-  ctx.font=`bold ${Math.min(W*0.06,28)}px serif`;
-  ctx.fillStyle='rgba(200,160,80,0.04)';
-  ctx.textAlign='center';
-  ctx.fillText(loc.name.toUpperCase(), W/2, H*0.12);
+
+  drawMinimap();
 }
- 
-function drawBuildings(W,H,loc){
-  if(!loc.buildings) return;
-  loc.buildings.forEach(b=>{
-    const bx=b.x*W, by=b.y*H, bw=b.w*W, bh=b.h*H;
-    const cx=bx+bw/2, cy=by+bh/2;
- 
-    // Glow for special buildings
-    if(b.glow){
-      const pulse=Math.sin(animT*0.002)*0.15+0.25;
-      const glowR=parseInt(b.color.slice(1,3),16);
-      const glowG=parseInt(b.color.slice(3,5),16);
-      const glowB=parseInt(b.color.slice(5,7),16);
-      const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,bw*1.2);
-      grd.addColorStop(0,`rgba(${glowR},${glowG},${glowB},${pulse})`);
-      grd.addColorStop(1,'transparent');
-      ctx.fillStyle=grd;
-      ctx.fillRect(bx-bw*0.5,by-bh*0.5,bw*2,bh*2);
-    }
- 
-    // Building shadow
-    ctx.fillStyle='rgba(0,0,0,0.35)';
-    ctx.fillRect(bx+4, by+4, bw, bh);
- 
-    // Building body
-    const bodyGrad=ctx.createLinearGradient(bx,by,bx,by+bh);
-    bodyGrad.addColorStop(0,lightenColor(b.color,20));
-    bodyGrad.addColorStop(1,b.color);
-    ctx.fillStyle=bodyGrad;
-    roundRect(ctx, bx, by, bw, bh, 4, true, false);
- 
-    // Border
-    ctx.strokeStyle=b.locked?'#3a1818':lightenColor(b.color,30);
-    ctx.lineWidth=1;
-    roundRect(ctx, bx, by, bw, bh, 4, false, true);
- 
+
+function ry_screen(top,h,wx){return wx;}
+
+function renderEntities(zBuf,W,H,bob){
+  const z=currentZoneData;
+  const ents=entities[GS.zone];
+  if(!ents) return;
+
+  const spriteData=[];
+  Object.values(ents).forEach(e=>{
+    if(!e.alive||(e.pickedUp&&e.type==='item')) return;
+    const dx=e.x-GS.px, dy=e.y-GS.py;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    spriteData.push({...e,dx,dy,dist});
+  });
+  // Sort back to front
+  spriteData.sort((a,b)=>b.dist-a.dist);
+
+  spriteData.forEach(e=>{
+    const invDet=1/(Math.cos(GS.angle)*Math.sin(GS.angle-Math.PI/2)-Math.sin(GS.angle)*Math.cos(GS.angle-Math.PI/2));
+    const tx=e.dy*Math.cos(GS.angle-Math.PI/2)-e.dx*Math.sin(GS.angle-Math.PI/2);
+    const tz=e.dx*Math.cos(GS.angle)-e.dy*Math.sin(GS.angle);
+    if(tz<0.3) return;
+
+    const sprW=Math.abs(Math.floor(H/tz));
+    const sprH=sprW;
+    const sprX=Math.floor((W/2)*(1+tx/tz)-sprW/2);
+    const sprY=Math.floor(H/2-sprH/2+bob);
+    const fog=Math.max(0,Math.min(1,1-tz/(z.fogDist||12)));
+    if(fog<0.05) return;
+
+    // Draw sprite as colored rectangle + icon
+    const isEnemy=e.type==='enemy';
+    const colR=isEnemy?200:100, colG=isEnemy?40:180, colB=isEnemy?40:80;
+    ctx.fillStyle=`rgba(${colR},${colG},${colB},${fog*0.5})`;
+    ctx.fillRect(sprX,sprY,sprW,sprH);
     // Icon
-    ctx.font=`${Math.min(bh*0.5,22)}px serif`;
+    const fs=Math.max(12,Math.min(48,sprW*0.6));
+    ctx.font=`${fs}px serif`;
     ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(b.locked?'🔒':b.icon, cx, cy-4);
- 
-    // Label
-    ctx.font=`bold ${Math.min(W*0.028,11)}px 'IM Fell English', serif`;
-    ctx.fillStyle=b.locked?'#5a3030':'rgba(220,184,120,0.85)';
-    ctx.textAlign='center';
-    ctx.fillText(b.label, cx, by+bh+11);
- 
-    // Portal indicator
-    if(b.portal && !b.locked){
-      ctx.font='9px serif';
-      ctx.fillStyle='rgba(200,146,42,0.5)';
-      ctx.fillText('▸ войти', cx, by+bh+22);
-    }
- 
-    // Item pickup indicator
-    const item=getLocItem(b.id);
-    if(item && !GS.flags[item.flag] && GS.stage>=item.neededStage){
-      const pulse=Math.sin(animT*0.004)*0.4+0.6;
-      ctx.fillStyle=`rgba(220,180,50,${pulse})`;
-      ctx.font='16px serif';
-      ctx.textAlign='center';
-      ctx.fillText('✨', bx+bw-8, by-4);
-    }
-  });
-}
- 
-function drawNPCs(W,H,loc){
-  if(!loc.npcs) return;
-  loc.npcs.forEach(npc=>{
-    const nx=npc.x*W, ny=npc.y*H;
-    drawCharSprite(nx, ny, npc);
-  });
-}
- 
-function drawCharSprite(nx,ny,npc){
-  const s=Math.min(canvas.width*0.025, 14);
-  const bob=Math.sin(animT*0.002+nx)*2;
- 
-  // Shadow
-  ctx.fillStyle='rgba(0,0,0,0.3)';
-  ctx.beginPath();ctx.ellipse(nx,ny+s*1.2,s*1,s*0.35,0,0,Math.PI*2);ctx.fill();
- 
-  // Body silhouette
-  const c=npc.color||'#8a5020';
-  ctx.fillStyle=shadeColor(c,-20);
-  roundRect(ctx,nx-s*0.7,ny-s*0.6,s*1.4,s*1.5,s*0.3,true,false);
- 
-  // Head
-  ctx.fillStyle='#e8a060';
-  ctx.beginPath();ctx.arc(nx,ny-s*0.8+bob,s*0.7,0,Math.PI*2);ctx.fill();
- 
-  // Glow ring for story NPC
-  const story=SCRIPTS[GS.story];
-  const isKey=isKeyNPC(npc.id);
-  if(isKey){
-    const pulse=Math.sin(animT*0.003)*0.3+0.4;
-    ctx.strokeStyle=c;
-    ctx.globalAlpha=pulse;
-    ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.arc(nx,ny+bob,s*2,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=fog;
+    ctx.fillText(e.icon||'?',sprX+sprW/2,sprY+sprH*0.55);
     ctx.globalAlpha=1;
-  }
- 
-  // Icon above head
-  ctx.font=`${s*1.4}px serif`;
-  ctx.textAlign='center';
-  ctx.fillText(npc.icon, nx, ny-s*2+bob);
- 
-  // Name
-  ctx.font=`bold ${Math.min(canvas.width*0.03,12)}px 'IM Fell English',serif`;
-  ctx.fillStyle=npc.color||'#c89040';
-  ctx.textAlign='center';
-  ctx.fillText(npc.name, nx, ny-s*3.2+bob);
- 
-  // Desc
-  ctx.font=`${Math.min(canvas.width*0.025,10)}px serif`;
-  ctx.fillStyle='rgba(120,80,30,0.8)';
-  ctx.fillText(npc.desc||'', nx, ny-s*2.2+bob);
-}
- 
-function drawPlayer2(W,H){
-  const px=player.x, py=player.y;
-  const s=Math.min(W*0.025,13);
- 
-  // Movement trail
-  if(player.tx!==null){
-    ctx.strokeStyle='rgba(200,146,42,0.15)';
-    ctx.lineWidth=1;
-    ctx.setLineDash([3,5]);
-    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(player.tx,player.ty);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(200,146,42,0.3)';
-    ctx.beginPath();ctx.arc(player.tx,player.ty,4,0,Math.PI*2);ctx.fill();
-  }
- 
-  // Shadow
-  ctx.fillStyle='rgba(0,0,0,0.4)';
-  ctx.beginPath();ctx.ellipse(px,py+s*1.2,s,s*0.35,0,0,Math.PI*2);ctx.fill();
- 
-  // Body
-  const bodyGrad=ctx.createLinearGradient(px,py-s,px,py+s);
-  bodyGrad.addColorStop(0,'#4a5a3a');
-  bodyGrad.addColorStop(1,'#2a3820');
-  ctx.fillStyle=bodyGrad;
-  roundRect(ctx,px-s*0.75,py-s*0.65,s*1.5,s*1.6,s*0.35,true,false);
- 
-  // Belt
-  ctx.fillStyle='#7a5010';
-  ctx.fillRect(px-s*0.75,py+s*0.1,s*1.5,s*0.25);
-  ctx.fillStyle='#dcb432';
-  ctx.fillRect(px-s*0.2,py+s*0.05,s*0.4,s*0.3);
- 
-  // Head
-  ctx.fillStyle='#e8a060';
-  ctx.beginPath();ctx.arc(px,py-s*0.85,s*0.72,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#3a2010';
-  ctx.fillRect(px-s*0.7,py-s*1.6,s*1.4,s*0.9);
- 
-  // Eyes
-  ctx.fillStyle='#0a0806';
-  ctx.fillRect(px-s*0.35,py-s,s*0.2,s*0.2);
-  ctx.fillRect(px+s*0.15,py-s,s*0.2,s*0.2);
- 
-  // "YOU" label
-  ctx.font=`bold ${Math.min(W*0.028,11)}px 'IM Fell English',serif`;
-  ctx.fillStyle='rgba(220,180,60,0.9)';
-  ctx.textAlign='center';
-  ctx.fillText('ТЫ', px, py-s*2.8);
-}
- 
-function drawProximityUI(W,H,loc){
-  nearbyInteractable=null;
-  const pr=70;
- 
-  if(loc.buildings){
-    for(const b of loc.buildings){
-      const bx=b.x*W+b.w*W/2, by=b.y*H+b.h*H/2;
-      if(dist2(player.x,player.y,bx,by)<pr*pr){
-        nearbyInteractable={type:'building',data:b,cx:bx,cy:by};
-        break;
-      }
+
+    // Health bar for enemies
+    if(isEnemy&&e.hp<e.maxHp){
+      const bw=sprW, bh=4;
+      ctx.fillStyle='rgba(0,0,0,0.7)';
+      ctx.fillRect(sprX,sprY-bh-2,bw,bh);
+      ctx.fillStyle=`rgba(220,40,40,${fog})`;
+      ctx.fillRect(sprX,sprY-bh-2,bw*(e.hp/e.maxHp),bh);
     }
-  }
-  if(!nearbyInteractable && loc.npcs){
-    for(const npc of loc.npcs){
-      const nx=npc.x*W, ny=npc.y*H;
-      if(dist2(player.x,player.y,nx,ny)<pr*pr){
-        nearbyInteractable={type:'npc',data:npc,cx:nx,cy:ny};
-        break;
-      }
+
+    // Name tag
+    if(tz<4&&e.name){
+      ctx.font=`bold ${Math.max(9,Math.min(14,sprW*0.3))}px Cinzel,serif`;
+      ctx.fillStyle=`rgba(200,160,60,${fog})`;
+      ctx.textAlign='center';
+      ctx.fillText(e.name,sprX+sprW/2,sprY-8);
     }
-  }
- 
-  if(nearbyInteractable){
-    const nb=nearbyInteractable;
-    const pulse=Math.sin(animT*0.005)*0.2+0.7;
-    // Highlight ring
-    ctx.strokeStyle=`rgba(220,184,60,${pulse})`;
-    ctx.lineWidth=2;
-    ctx.beginPath();ctx.arc(nb.cx,nb.cy,42,0,Math.PI*2);ctx.stroke();
-    // Label
-    const label=nb.type==='npc'?`💬 ${nb.data.name}`:`${nb.data.icon} ${nb.data.label}`;
-    ctx.font=`bold ${Math.min(W*0.03,12)}px 'IM Fell English',serif`;
-    const tw=ctx.measureText(label).width;
-    ctx.fillStyle='rgba(8,4,0,0.85)';
-    roundRect(ctx,nb.cx-tw/2-10,nb.cy-64,tw+20,24,3,true,false);
-    ctx.strokeStyle='rgba(200,140,40,0.4)';
-    ctx.lineWidth=1;
-    roundRect(ctx,nb.cx-tw/2-10,nb.cy-64,tw+20,24,3,false,true);
-    ctx.fillStyle='rgba(220,180,60,0.9)';
-    ctx.textAlign='center';
-    ctx.fillText(label, nb.cx, nb.cy-47);
-  }
-}
- 
-// ══════════════════════════════════════════
-//  INTERACTION
-// ══════════════════════════════════════════
-function onTap(e){
-  if(dlgActive||mapOpen) return;
-  const rect=canvas.getBoundingClientRect();
-  const tx=e.clientX-rect.left, ty=e.clientY-rect.top;
-  const W=canvas.width, H=canvas.height;
-  const loc=LOCATIONS[GS.loc];
-  const pr=70;
- 
-  // Check NPC tap
-  if(loc.npcs){
-    for(const npc of loc.npcs){
-      const nx=npc.x*W, ny=npc.y*H;
-      if(dist2(tx,ty,nx,ny)<pr*pr){
-        interactNPC(npc);return;
-      }
-    }
-  }
-  // Check building tap
-  if(loc.buildings){
-    for(const b of loc.buildings){
-      const bx=b.x*W, by=b.y*H, bw=b.w*W, bh=b.h*H;
-      if(tx>=bx&&tx<=bx+bw&&ty>=by&&ty<=by+bh){
-        interactBuilding(b);return;
-      }
-    }
-  }
-  // Move
-  player.tx=tx; player.ty=ty;
-}
- 
-function doAction(){
-  if(dlgActive){nextLine();return;}
-  if(nearbyInteractable){
-    if(nearbyInteractable.type==='npc') interactNPC(nearbyInteractable.data);
-    else interactBuilding(nearbyInteractable.data);
-  } else {
-    showToast('Подойди к персонажу или объекту');
-  }
-}
- 
-function interactNPC(npc){
-  const s=GS.story, st=GS.stage;
-  const key=`${s}_${npc.id}_${st}`;
-  const keyAfter=`${s}_${npc.id}_after`;
-  const keyAny=`${s}_${npc.id}_any`;
-  let lines=DIALOGUES[key]||DIALOGUES[keyAfter]||DIALOGUES[keyAny];
-  if(lines) startDlg(lines);
-  else showToast(`${npc.icon} ${npc.name} молчит.`);
-}
- 
-function interactBuilding(b){
-  if(b.locked){showToast('🔒 Заперто');return;}
- 
-  // Item pickup
-  const item=getLocItem(b.id);
-  if(item && !GS.flags[item.flag] && GS.stage>=item.neededStage){
-    GS.flags[item.flag]=true;
-    GS.items.push(item.name);
-    showToast(`✨ Найдено: ${item.name}`);
-    updateHUD();
-    advanceStageOnItem();
-    return;
-  }
- 
-  // Portal
-  if(b.portal){
-    if(b.portal==='mine'&&GS.stage<1){showToast('⚠ Сначала поговори с главным NPC!');return;}
-    goToLoc(b.portal);
-    return;
-  }
- 
-  // Generic interact
-  showToast(`${b.icon} ${b.label} — ${getBuildingFlavor(b.id)}`);
-}
- 
-function getBuildingFlavor(id){
-  const f={
-    campfire:'Огонь потрескивает. Чуть теплее.',
-    bar:'Ганс протирает кружку. Взгляд колючий.',
-    table1:'Свеча оплыла. Кто-то забыл кружку.',
-    table2:'Карты рассыпаны. Кто-то проиграл.',
-    forge:'Жар. Металл кричит под молотом.',
-    anvil:'Тяжёлая наковальня. Что-то спрятано?',
-    chest:'Набор инструментов. Ничего лишнего.',
-    rack:'Оружие. Плохое, но острое.',
-    altar:'Камень светится. Руки чувствуют вибрацию.',
-    tower:'Разрушена. Но вид сверху — на весь лагерь.',
-    well:'Бездонный. Или нет. Снизу что-то смотрит.',
-    stone:'Руны. Старые. Язык не поддаётся.',
-    cell1:'Решётка. Тускло. Запах.',
-    cell2:'Тихо. Почти.',
-    cell3:'Пусто. Кто-то был здесь.',
-    guard_post:'Стражник дремлет. Неловко.',
-    shaft1:'Темнота. Запах сырости и чего-то ещё.',
-    shaft2:'Заперто. Нужен ключ.',
-    ore1:'Руда блестит в свете фонаря.',
-    bones:'Чьи-то кости. Имени нет.',
-  };
-  return f[id]||'Ничего особенного.';
-}
- 
-function isKeyNPC(npcId){
-  const s=GS.story, st=GS.stage;
-  return !!(DIALOGUES[`${s}_${npcId}_${st}`]);
-}
- 
-function getLocItem(bldId){
-  if(!GS.story) return null;
-  const items=ITEMS[GS.story]||{};
-  for(const k in items){
-    if(items[k].locId===GS.loc && items[k].bldId===bldId) return items[k];
-  }
-  return null;
-}
- 
-function advanceStageOnItem(){
-  // Automatically advance stage when items collected
-  const script=SCRIPTS[GS.story];
-  const items=ITEMS[GS.story]||{};
-  const allForStage=Object.values(items).filter(i=>i.neededStage===GS.stage);
-  const allCollected=allForStage.every(i=>GS.flags[i.flag]);
-  if(allCollected && allForStage.length>0){
-    GS.stage++;
-    showToast('↑ '+script.questText[GS.stage]);
-    updateHUD();
-  }
-}
- 
-// ══════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════
-function goToLoc(locId){
-  GS.prevLoc=GS.loc;
-  GS.loc=locId;
-  player.x=canvas.width/2;
-  player.y=canvas.height*0.55;
-  player.tx=null; player.ty=null;
-  document.getElementById('hud-loc').textContent='📍 '+LOCATIONS[locId].name;
-  updateHUD();
-  showToast('📍 '+LOCATIONS[locId].name);
-}
- 
-function toggleMap(){
-  mapOpen=!mapOpen;
-  const ov=document.getElementById('map-overlay');
-  if(mapOpen){
-    buildMapUI();
-    ov.style.display='flex';
-  } else {
-    ov.style.display='none';
-  }
-}
- 
-function buildMapUI(){
-  const grid=document.getElementById('map-grid');
-  grid.innerHTML='';
-  const order=['camp','tavern','smithy','prison','ruins','mine'];
-  order.forEach(id=>{
-    const loc=LOCATIONS[id];
-    const isCurrent=GS.loc===id;
-    const isLocked=id==='mine'&&GS.stage<1;
-    const div=document.createElement('div');
-    div.className='map-loc'+(isCurrent?' active':'')+(isLocked?' locked':'');
-    div.innerHTML=`
-      ${isCurrent?'<div class="map-loc-badge">ЗДЕСЬ</div>':''}
-      <div class="map-loc-icon">${loc.icon}</div>
-      <div class="map-loc-name">${loc.name}</div>
-      <div class="map-loc-desc">${loc.desc}</div>
-    `;
-    if(!isLocked) div.onclick=()=>{goToLoc(id);toggleMap();};
-    grid.appendChild(div);
+    // Store screen pos for proximity check
+    e._screenX=sprX+sprW/2; e._screenY=sprY+sprH/2; e._screenW=sprW; e._dist=tz;
   });
 }
- 
-// ══════════════════════════════════════════
-//  DIALOGUE
-// ══════════════════════════════════════════
-function startDlg(lines){
-  if(!lines||!lines.length) return;
-  dlgQueue=lines; dlgIdx=0; dlgActive=true;
-  showDlgLine();
-  updateHUD();
-}
-function showDlgLine(){
-  const l=dlgQueue[dlgIdx];
-  const dlg=document.getElementById('dlg');
-  const name=document.getElementById('dlg-name');
-  const ico=document.getElementById('dlg-ico');
-  const sep=document.getElementById('dlg-sep');
-  const body=document.getElementById('dlg-body');
-  const bar=document.getElementById('dlg-bar-fill');
-  ico.textContent=l.ico||'';
-  name.textContent=l.spk;
-  name.style.color=l.c||'#dcb432';
-  sep.style.color=l.c||'#dcb432';
-  body.textContent=l.txt;
-  bar.style.width=((dlgIdx+1)/dlgQueue.length*100)+'%';
-  dlg.style.display='block';
-}
-function nextLine(){
-  if(!dlgActive) return;
-  dlgIdx++;
-  if(dlgIdx>=dlgQueue.length) endDlg();
-  else showDlgLine();
-}
-function endDlg(){
-  dlgActive=false;
-  document.getElementById('dlg').style.display='none';
-  checkStageAdvance();
-  checkEnding();
-  updateHUD();
-}
- 
-function checkStageAdvance(){
-  // Stage advances after key dialogues
-  const s=GS.story, st=GS.stage;
-  const script=SCRIPTS[s];
-  // We advance stage when specific dialogues fire
-  const stageDialogues={
-    power:{0:'power_barkeep_0',1:'power_torg_1',2:'power_prisoner1_2',3:'power_stranger_3'},
-    arcane:{0:'arcane_ela_0',1:'arcane_spirit_1',2:'arcane_ela_2',3:'arcane_ela_3',4:'arcane_barkeep_3'},
-    justice:{0:'justice_prisoner1_0',1:'justice_prisoner2_1',2:'justice_torg_2',3:'justice_ran_3'}
-  };
-  const advanceAt=stageDialogues[s]&&stageDialogues[s][st];
-  // Check last fired dialogue
-  if(advanceAt){
-    const expected=advanceAt;
-    const fired=`${s}_${lastFiredNPC}_${st}`;
-    if(fired===expected||`${s}_${lastFiredNPC}_after`===expected){
-      GS.stage++;
-      const next=script.questText[GS.stage];
-      if(next&&next!=='ЗАВЕРШЕНО') setTimeout(()=>showToast('📜 '+next),400);
-      updateHUD();
-    }
+
+function renderWeapon(W,H,bob){
+  const w=GS.weapon;
+  const atkFactor=attackAnim>0?Math.sin(attackAnim*Math.PI):0;
+  const handY=H*0.62+bob+atkFactor*30;
+  const handX=W*0.55;
+  const handW=W*0.25, handH=H*0.28;
+
+  // Hand/arm
+  ctx.fillStyle='#e8a060';
+  roundRectCtx(ctx,handX,handY,handW*0.5,handH*0.6,6,true);
+  // Weapon
+  if(w.name==='Железный меч'){
+    ctx.fillStyle='#909090';
+    ctx.fillRect(handX+handW*0.15,handY-handH*0.7,handW*0.15,handH*0.75);
+    ctx.fillStyle='#6a4010';
+    ctx.fillRect(handX+handW*0.08,handY-handH*0.1,handW*0.3,handH*0.12);
+  } else if(w.name==='Кинжал'){
+    ctx.fillStyle='#c0c0c0';
+    ctx.fillRect(handX+handW*0.15,handY-handH*0.55,handW*0.12,handH*0.55);
+    ctx.fillStyle='#5a3010';
+    ctx.fillRect(handX+handW*0.09,handY-handH*0.06,handW*0.25,handH*0.1);
+  } else {
+    // Fist
+    ctx.fillStyle='#d48840';
+    roundRectCtx(ctx,handX+handW*0.05,handY-handH*0.12,handW*0.42,handH*0.2,5,true);
+  }
+
+  // Attack flash
+  if(atkFactor>0.3){
+    ctx.fillStyle=`rgba(255,200,50,${(atkFactor-0.3)*0.4})`;
+    ctx.fillRect(0,0,W,H);
   }
 }
- 
-let lastFiredNPC='';
-const origInteractNPC=interactNPC;
- 
-// ══════════════════════════════════════════
-//  ENDING
-// ══════════════════════════════════════════
-function checkEnding(){
-  const endTrigger={
-    power:{4:'power_liana_4'},
-    arcane:{4:'arcane_ela_4'},
-    justice:{3:'justice_ran_3'}
-  };
-  const trigger=endTrigger[GS.story]&&endTrigger[GS.story][GS.stage-1];
-  if(trigger){
-    const script=SCRIPTS[GS.story];
-    const ending=Object.values(script.endings)[0];
-    setTimeout(()=>showEnding(ending),600);
-  }
-}
- 
-function showEnding(e){
-  const el=document.getElementById('ending');
-  document.getElementById('end-icon').textContent=e.icon;
-  document.getElementById('end-chapter').textContent=e.chapter;
-  document.getElementById('end-title').textContent=e.title;
-  document.getElementById('end-text').textContent=e.text;
-  document.getElementById('end-rewards').innerHTML=e.rewards.map(r=>`<div class="end-reward">${r}</div>`).join('');
-  el.style.display='flex';
-}
- 
-// ══════════════════════════════════════════
-//  HUD
-// ══════════════════════════════════════════
-function updateHUD(){
-  if(!GS.story) return;
-  const script=SCRIPTS[GS.story];
-  document.getElementById('hud-qv').textContent=script.questText[GS.stage]||'Исследуй';
-  document.getElementById('hud-loc').textContent='📍 '+(LOCATIONS[GS.loc]?.name||'');
-  const inv=document.getElementById('hud-inv');
-  if(GS.items.length){
-    inv.style.display='block';
-    inv.textContent=GS.items.join(' · ');
-  }
-}
- 
-// ══════════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════════
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  if(toastTmr) clearTimeout(toastTmr);
-  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
-}
- 
-// ══════════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════════
-function dist2(x1,y1,x2,y2){return (x1-x2)**2+(y1-y2)**2;}
- 
-function roundRect(ctx,x,y,w,h,r,fill,stroke){
+
+function roundRectCtx(ctx,x,y,w,h,r,fill){
   ctx.beginPath();
   ctx.moveTo(x+r,y);
   ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
@@ -1317,69 +837,455 @@ function roundRect(ctx,x,y,w,h,r,fill,stroke){
   ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
   ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
   ctx.closePath();
-  if(fill)ctx.fill();
-  if(stroke)ctx.stroke();
+  if(fill) ctx.fill();
 }
- 
-function shadeColor(color,amount){
-  const num=parseInt(color.replace('#',''),16);
-  const r=Math.min(255,Math.max(0,(num>>16)+amount));
-  const g=Math.min(255,Math.max(0,((num>>8)&0xff)+amount));
-  const b=Math.min(255,Math.max(0,(num&0xff)+amount));
-  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
-function lightenColor(c,a){return shadeColor(c,a);}
- 
-// NPC tracking
-function interactNPC(npc){
-  lastFiredNPC=npc.id;
-  const s=GS.story, st=GS.stage;
-  const key=`${s}_${npc.id}_${st}`;
-  const keyAfter=`${s}_${npc.id}_after`;
-  const keyAny=`${s}_${npc.id}_any`;
-  let lines=DIALOGUES[key]||DIALOGUES[keyAfter]||DIALOGUES[keyAny];
-  if(lines){
-    startDlg(lines);
-    // Advance stage after this dialogue ends
-    setTimeout(()=>checkStageAdvanceFor(npc.id, st),50);
-  } else {
-    showToast(`${npc.icon} ${npc.name} молчит.`);
+
+// ══════════════════════════════════════════════════
+//  MINIMAP
+// ══════════════════════════════════════════════════
+function drawMinimap(){
+  const mc=document.getElementById('minimap');
+  const mx=mc.getContext('2d');
+  const mw=90,mh=90;
+  mx.clearRect(0,0,mw,mh);
+  mx.fillStyle='rgba(4,2,0,0.88)';
+  mx.fillRect(0,0,mw,mh);
+  const z=currentZoneData;
+  const cs=Math.min(mw/z.w,mh/z.h);
+  for(let y=0;y<z.h;y++){
+    for(let x=0;x<z.w;x++){
+      mx.fillStyle=z.map[y][x]===1?'#3a2010':'#1a1208';
+      mx.fillRect(x*cs,y*cs,cs,cs);
+    }
   }
+  // Portals
+  (z.portals||[]).forEach(p=>{
+    mx.fillStyle='rgba(200,146,42,0.7)';
+    mx.fillRect(p.x*cs,p.y*cs,cs*1.5,cs*1.5);
+  });
+  // Enemies
+  const ents=entities[GS.zone];
+  if(ents) Object.values(ents).forEach(e=>{
+    if(!e.alive) return;
+    if(e.type==='enemy'){mx.fillStyle='rgba(220,40,40,0.9)';mx.fillRect(e.x*cs-1,e.y*cs-1,3,3);}
+    if(e.type==='npc'){mx.fillStyle='rgba(60,180,80,0.9)';mx.fillRect(e.x*cs-1,e.y*cs-1,3,3);}
+  });
+  // Player
+  mx.fillStyle='rgba(220,180,60,1)';
+  mx.beginPath();
+  mx.arc(GS.px*cs,GS.py*cs,2.5,0,Math.PI*2);
+  mx.fill();
+  // Player direction
+  mx.strokeStyle='rgba(220,180,60,.7)';
+  mx.lineWidth=1;
+  mx.beginPath();
+  mx.moveTo(GS.px*cs,GS.py*cs);
+  mx.lineTo(GS.px*cs+Math.cos(GS.angle)*5,GS.py*cs+Math.sin(GS.angle)*5);
+  mx.stroke();
 }
- 
-function checkStageAdvanceFor(npcId, firedStage){
-  if(GS.stage!==firedStage) return; // already advanced
-  const stageMap={
-    power: {0:'barkeep',1:'torg',2:'prisoner1',3:'stranger',4:'liana'},
-    arcane:{0:'ela',1:'spirit',2:'ela',3:'ela',4:'barkeep'},
-    justice:{0:'prisoner1',1:'prisoner2',2:'torg',3:'ran'}
-  };
-  const expectedNpc=stageMap[GS.story]&&stageMap[GS.story][firedStage];
-  if(expectedNpc===npcId){
-    setTimeout(()=>{
-      if(GS.stage===firedStage){
-        GS.stage++;
-        const script=SCRIPTS[GS.story];
-        const next=script.questText[GS.stage];
-        if(next&&next!=='ЗАВЕРШЕНО') showToast('📜 '+next);
-        updateHUD();
-        checkEnding();
+
+// ══════════════════════════════════════════════════
+//  GAME LOOP
+// ══════════════════════════════════════════════════
+let lastT=0;
+function loop(ts){
+  frameId=requestAnimationFrame(loop);
+  const dt=Math.min(0.05,(ts-lastT)/1000);
+  lastT=ts;
+  if(dlgActive||choiceActive) return render();
+
+  // Move
+  const spd=(sprinting?4.5:2.8)*dt;
+  const lookSpd=2.5*dt;
+  const jdx=joystick.dx, jdy=joystick.dy;
+  if(jdx!==0||jdy!==0){
+    const mag=Math.sqrt(jdx*jdx+jdy*jdy);
+    const nx=jdx/mag, ny=jdy/mag;
+    // Forward/back
+    const fwd=nx*Math.cos(GS.angle)+ny*Math.sin(GS.angle);
+    const str=nx*Math.cos(GS.angle+Math.PI/2)+ny*Math.sin(GS.angle+Math.PI/2);
+    const moveSpd=Math.min(spd,spd*mag);
+    tryMove(GS.px+Math.cos(GS.angle)*fwd*moveSpd,GS.py+Math.sin(GS.angle)*fwd*moveSpd);
+    tryMove(GS.px+Math.cos(GS.angle+Math.PI/2)*str*moveSpd,GS.py+Math.sin(GS.angle+Math.PI/2)*str*moveSpd);
+    bobTime+=dt*(sprinting?2:1)*Math.abs(fwd);
+  }
+
+  // Attack animation
+  if(attackAnim>0) attackAnim=Math.max(0,attackAnim-dt*3);
+
+  // AI / enemy movement
+  updateEnemies(dt);
+  // Proximity checks
+  checkProximity();
+  render();
+}
+
+function tryMove(nx,ny){
+  if(!isWall(nx,GS.py)) GS.px=nx;
+  if(!isWall(GS.px,ny)) GS.py=ny;
+  // Clamp
+  const z=currentZoneData;
+  GS.px=Math.max(0.6,Math.min(z.w-0.6,GS.px));
+  GS.py=Math.max(0.6,Math.min(z.h-0.6,GS.py));
+}
+
+// ══════════════════════════════════════════════════
+//  ENEMY AI
+// ══════════════════════════════════════════════════
+function updateEnemies(dt){
+  const ents=entities[GS.zone];
+  if(!ents) return;
+  Object.values(ents).forEach(e=>{
+    if(!e.alive||e.type!=='enemy') return;
+    const dx=GS.px-e.x, dy=GS.py-e.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    // Chase if close
+    if(dist<6&&dist>0.6){
+      const spd=1.2*dt;
+      const nx=e.x+dx/dist*spd, ny=e.y+dy/dist*spd;
+      if(!isWall(nx,e.y)) e.x=nx;
+      if(!isWall(e.x,ny)) e.y=ny;
+    }
+    // Attack player
+    if(dist<0.8){
+      const now=Date.now();
+      if(!e._lastAtk||now-e._lastAtk>1200){
+        e._lastAtk=now;
+        takeDamage(e.dmg);
       }
-    },400);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  COMBAT
+// ══════════════════════════════════════════════════
+function doAttack(){
+  if(dlgActive||choiceActive) return;
+  const now=Date.now();
+  const cooldown=GS.weapon.speed||300;
+  if(now-lastAttack<cooldown) return;
+  lastAttack=now;
+  attackAnim=1;
+
+  const ents=entities[GS.zone];
+  if(!ents) return;
+  let hit=false;
+  Object.values(ents).forEach(e=>{
+    if(!e.alive||e.type!=='enemy') return;
+    const dx=e.x-GS.px, dy=e.y-GS.py;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    const angle=Math.atan2(dy,dx);
+    const angleDiff=Math.abs(normalizeAngle(angle-GS.angle));
+    if(dist<2.2&&angleDiff<Math.PI/3){
+      const dmg=GS.weapon.dmg+(Math.random()*5|0);
+      e.hp-=dmg;
+      showToast(`⚔ ${e.name}: -${dmg} HP`);
+      hit=true;
+      if(e.hp<=0){
+        e.alive=false;
+        GS.xp+=e.xp;
+        showToast(`☠ ${e.name} убит! +${e.xp} XP`);
+        updateHUD();
+      }
+    }
+  });
+  if(!hit) showToast('...');
+  updateHUD();
+}
+
+function takeDamage(dmg){
+  GS.hp=Math.max(0,GS.hp-dmg);
+  flashHit();
+  updateHUD();
+  if(GS.hp<=0){
+    showToast('💀 Ты пал. Восстановление...');
+    setTimeout(()=>{GS.hp=Math.floor(GS.maxHp*0.4);updateHUD();showToast('💫 Ты очнулся у костра.');},1500);
   }
 }
- 
+
+function heal(amount){
+  GS.hp=Math.min(GS.maxHp,GS.hp+amount);
+  flashHeal();
+  updateHUD();
+  showToast(`💚 +${amount} HP`);
+}
+
+function flashHit(){
+  const f=document.getElementById('hit-flash');
+  f.style.opacity='1';setTimeout(()=>f.style.opacity='0',150);
+}
+function flashHeal(){
+  const f=document.getElementById('heal-flash');
+  f.style.opacity='1';setTimeout(()=>f.style.opacity='0',200);
+}
+
+function normalizeAngle(a){
+  while(a>Math.PI)a-=Math.PI*2;
+  while(a<-Math.PI)a+=Math.PI*2;
+  return a;
+}
+
+// ══════════════════════════════════════════════════
+//  PROXIMITY & INTERACTION
+// ══════════════════════════════════════════════════
+let nearEntity=null;
+function checkProximity(){
+  const ents=entities[GS.zone];
+  const z=currentZoneData;
+  const prompt=document.getElementById('interact-prompt');
+  nearEntity=null;
+  let best=999;
+
+  if(ents){
+    Object.values(ents).forEach(e=>{
+      if(!e.alive||(e.pickedUp&&e.type==='item')) return;
+      const dx=e.x-GS.px, dy=e.y-GS.py;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<1.8&&dist<best){best=dist;nearEntity={kind:'entity',data:e};}
+    });
+  }
+
+  // Check portals
+  (z.portals||[]).forEach(p=>{
+    const dx=(p.x+0.5)-GS.px, dy=(p.y+0.5)-GS.py;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<1.5&&dist<best){best=dist;nearEntity={kind:'portal',data:p};}
+  });
+
+  if(nearEntity){
+    prompt.style.display='block';
+    if(nearEntity.kind==='portal') prompt.textContent='↵ '+nearEntity.data.label;
+    else if(nearEntity.data.type==='npc') prompt.textContent='💬 '+nearEntity.data.name;
+    else if(nearEntity.data.type==='item') prompt.textContent='✋ '+nearEntity.data.label;
+    else prompt.textContent='⚔ '+nearEntity.data.name;
+  } else {
+    prompt.style.display='none';
+  }
+}
+
+function doInteract(){
+  if(dlgActive){nextDlgLine();return;}
+  if(choiceActive) return;
+  if(!nearEntity) return;
+
+  if(nearEntity.kind==='portal'){
+    if(nearEntity.data.zone==='mine'&&GS.stage<1){showToast('⚠ Сначала поговори с союзником!');return;}
+    loadZone(nearEntity.data.zone);
+    return;
+  }
+
+  const e=nearEntity.data;
+  if(e.type==='npc'){
+    const d=DIALOGUES[e.dialogue||e.id];
+    if(d) startDlg(d.lines,d.onEnd,d.choice);
+    else showToast(e.icon+' '+e.name+' молчит.');
+  } else if(e.type==='item'){
+    const d=DIALOGUES[e.interact||e.id];
+    if(d){
+      e.pickedUp=d.itemGiven!==undefined?true:false;
+      startDlg(d.lines,d.onEnd,d.choice);
+    } else showToast(e.icon+' '+e.label);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  DIALOGUE
+// ══════════════════════════════════════════════════
+let dlgEndCb=null, dlgChoice=null;
+function startDlg(lines,onEnd,choice){
+  dlgQ=lines; dlgI=0; dlgActive=true;
+  dlgEndCb=onEnd||null; dlgChoice=choice||null;
+  showDlgLine();
+}
+function showDlgLine(){
+  const l=dlgQ[dlgI];
+  document.getElementById('dlg-ico').textContent=l.i||'';
+  document.getElementById('dlg-nm').textContent=l.s;
+  document.getElementById('dlg-nm').style.color=l.c||'#dcb432';
+  document.getElementById('dlg-sep').style.color=l.c||'#dcb432';
+  document.getElementById('dlg-body').textContent=l.t;
+  document.getElementById('dlg-fill').style.width=((dlgI+1)/dlgQ.length*100)+'%';
+  document.getElementById('dlg').style.display='block';
+}
+function nextDlgLine(){
+  dlgI++;
+  if(dlgI>=dlgQ.length){
+    dlgActive=false;
+    document.getElementById('dlg').style.display='none';
+    if(dlgEndCb) dlgEndCb();
+    if(dlgChoice) showChoices(dlgChoice);
+    else checkEnding();
+  } else showDlgLine();
+}
+
+function showChoices(choice){
+  choiceActive=true;
+  const box=document.getElementById('choices');
+  const list=document.getElementById('choices-list');
+  document.getElementById('choices-title').textContent=choice.title||'— ВЫБОР —';
+  list.innerHTML='';
+  choice.options.forEach(opt=>{
+    if(opt.storyFilter&&!opt.storyFilter.includes(GS.story)) return;
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=opt.text;
+    btn.onclick=()=>handleChoice(opt.outcome);
+    list.appendChild(btn);
+  });
+  box.style.display='block';
+}
+
+function handleChoice(outcome){
+  choiceActive=false;
+  document.getElementById('choices').style.display='none';
+  if(!outcome) return;
+  switch(outcome){
+    case 'list_found':addItem('📋 Список Лиарда');advanceIfStory('justice',2);break;
+    case 'tools_inspect':showToast('Молоток, клещи, зубило. Ничего необычного.');break;
+    case 'take_sword':GS.weapon={name:'Железный меч',dmg:20,speed:500};showToast('⚔ Получено: Железный меч (+15 атаки)');break;
+    case 'take_dagger':GS.weapon={name:'Кинжал',dmg:15,speed:250};showToast('🗡 Получено: Кинжал');break;
+    case 'copy_runes':addItem('🔺 Символы алтаря');advanceIfStory('arcane',3);break;
+    case 'break_altar':takeDamage(25);showToast('💥 Алтарь ударил тебя отдачей! -25 HP');break;
+    case 'open_chest':addItem('🥉 Медный амулет');showToast('Найдено: Медный амулет');break;
+  }
+  checkEnding();
+}
+
+// ══════════════════════════════════════════════════
+//  STORY PROGRESSION
+// ══════════════════════════════════════════════════
+function advanceIfStory(story,targetStage){
+  if(GS.story===story&&GS.stage===targetStage){
+    GS.stage++;
+    const s=STORIES[story];
+    const next=s.quest[GS.stage];
+    if(next) setTimeout(()=>showToast('📜 '+next),400);
+    updateHUD();
+    checkEnding();
+  }
+}
+
+function addItem(name){
+  if(!GS.items.includes(name)){
+    GS.items.push(name);
+    showToast('✨ Получено: '+name);
+    updateHUD();
+  }
+}
+
 function checkEnding(){
-  const endStages={power:5,arcane:5,justice:4};
-  if(GS.stage>=endStages[GS.story]){
-    const script=SCRIPTS[GS.story];
-    const ending=Object.values(script.endings)[0];
-    setTimeout(()=>showEnding(ending),700);
+  const story=STORIES[GS.story];
+  if(GS.stage>=story.endStage){
+    setTimeout(()=>{
+      const e=story.ending;
+      document.getElementById('e-ic').textContent=e.icon;
+      document.getElementById('e-ch').textContent=e.ch;
+      document.getElementById('e-t').textContent=e.title;
+      document.getElementById('e-tx').textContent=e.text;
+      document.getElementById('e-rw-list').innerHTML=e.rewards.map(r=>`<div class="e-r">${r}</div>`).join('');
+      document.getElementById('end').style.display='flex';
+    },900);
   }
 }
- 
+
+// ══════════════════════════════════════════════════
+//  HUD
+// ══════════════════════════════════════════════════
+function updateHUD(){
+  if(!GS.story) return;
+  const story=STORIES[GS.story];
+  document.getElementById('quest-text').textContent=story.quest[GS.stage]||'Исследуй';
+  // HP bar
+  const hpPct=GS.hp/GS.maxHp*100;
+  document.getElementById('hp-bar').style.width=hpPct+'%';
+  document.getElementById('hp-val').textContent=GS.hp+' / '+GS.maxHp;
+  // XP bar
+  const xpNext=(Math.floor(GS.xp/100)+1)*100;
+  document.getElementById('xp-bar').style.width=(GS.xp%100)+'%';
+  document.getElementById('xp-val').textContent=GS.xp+' XP';
+  // Items
+  const inv=document.getElementById('inv-box');
+  if(GS.items.length){inv.style.display='block';inv.textContent=GS.items.join(' · ');}
+  // Weapon
+  document.querySelector('#btn-attack').title=GS.weapon.name+' DMG:'+GS.weapon.dmg;
+}
+
+// ══════════════════════════════════════════════════
+//  TOUCH CONTROLS
+// ══════════════════════════════════════════════════
+function setupControls(){
+  // Joystick
+  const jArea=document.getElementById('joystick-area');
+  const jDot=document.getElementById('joystick-dot');
+  jArea.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    joystick.active=true;
+    joystick.startX=t.clientX;
+    joystick.startY=t.clientY;
+    e.preventDefault();
+  },{passive:false});
+  jArea.addEventListener('touchmove',e=>{
+    if(!joystick.active) return;
+    const t=e.touches[0];
+    const dx=t.clientX-joystick.startX;
+    const dy=t.clientY-joystick.startY;
+    const maxR=35;
+    const mag=Math.sqrt(dx*dx+dy*dy);
+    const clampX=mag>maxR?dx/mag*maxR:dx;
+    const clampY=mag>maxR?dy/mag*maxR:dy;
+    jDot.style.transform=`translate(calc(-50% + ${clampX}px), calc(-50% + ${clampY}px))`;
+    joystick.dx=clampX/maxR;
+    joystick.dy=clampY/maxR;
+    e.preventDefault();
+  },{passive:false});
+  ['touchend','touchcancel'].forEach(ev=>{
+    jArea.addEventListener(ev,e=>{
+      joystick.active=false; joystick.dx=0; joystick.dy=0;
+      jDot.style.transform='translate(-50%,-50%)';
+    });
+  });
+
+  // Look area (right side)
+  const lArea=document.getElementById('look-area');
+  lArea.addEventListener('touchstart',e=>{
+    if(dlgActive){nextDlgLine();return;}
+    const t=e.touches[0];
+    lookTouch.active=true;
+    lookTouch.startX=t.clientX;
+    lookTouch.startAngle=GS.angle;
+    e.preventDefault();
+  },{passive:false});
+  lArea.addEventListener('touchmove',e=>{
+    if(!lookTouch.active) return;
+    const t=e.touches[0];
+    const dx=t.clientX-lookTouch.startX;
+    GS.angle=lookTouch.startAngle+dx*0.006;
+    e.preventDefault();
+  },{passive:false});
+  ['touchend','touchcancel'].forEach(ev=>{
+    lArea.addEventListener(ev,()=>{lookTouch.active=false;});
+  });
+
+  // Sprint
+  const sprintBtn=document.getElementById('btn-sprint');
+  sprintBtn.addEventListener('touchstart',()=>{sprinting=true;},{passive:true});
+  sprintBtn.addEventListener('touchend',()=>{sprinting=false;},{passive:true});
+}
+
+// ══════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  if(toastT) clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
 window.addEventListener('resize',()=>{
-  if(canvas){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  canvas.width=Math.min(window.innerWidth,480);
+  canvas.height=window.innerHeight;
 });
 </script>
 </body>
