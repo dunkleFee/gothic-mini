@@ -1,368 +1,476 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Колония — за Барьером</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>Колония — За Барьером</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IM+Fell+English:ital@0;1&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --gold:   #D4A830;
+  --gold2:  #A07818;
+  --dark:   #0A0806;
+  --panel:  rgba(10,7,3,0.92);
+  --border: #6B4E1A;
+  --text:   #C8B490;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--dark);
+  font-family: 'IM Fell English', Georgia, serif;
+  overflow: hidden; height: 100vh; width: 100vw;
+  cursor: crosshair;
+}
 
-    body {
-      background: #0a0806;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-      font-family: 'IM Fell English', serif;
-    }
+/* ── TITLE ──────────────────────────────────────────────── */
+#title {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 35%, #1E1005 0%, #050301 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 100;
+}
+#title::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+  pointer-events: none;
+}
+.t-rune { font-size:12px; letter-spacing:.5em; color:#3A2508; font-family:'Cinzel',serif; margin-bottom:28px; }
+#title h1 {
+  font-family:'Cinzel',serif; font-weight:900;
+  font-size:clamp(36px,7vw,64px); color:var(--gold);
+  letter-spacing:.2em;
+  text-shadow:0 0 60px rgba(200,140,20,.5),0 0 120px rgba(200,140,20,.2);
+  margin-bottom:8px; line-height:1;
+}
+.t-sub { font-style:italic; font-size:clamp(13px,2.2vw,19px); color:#7A5820; letter-spacing:.15em; margin-bottom:48px; }
+.t-div {
+  width:280px; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(180,110,20,.6),transparent);
+  margin:0 auto 36px; position:relative;
+}
+.t-div::before,.t-div::after { content:'◆'; position:absolute; top:50%; transform:translateY(-50%); color:#6A4010; font-size:8px; }
+.t-div::before { left:60px; } .t-div::after { right:60px; }
+.t-lore { font-style:italic; font-size:clamp(12px,1.6vw,15px); color:#5A4218; max-width:400px; text-align:center; line-height:1.9; margin-bottom:52px; }
+.btn {
+  font-family:'Cinzel',serif; font-size:14px; letter-spacing:.16em; text-transform:uppercase;
+  color:#C8A040; background:transparent; border:1px solid #6B4E1A; border-radius:2px;
+  padding:11px 34px; cursor:pointer; transition:all .22s;
+  box-shadow:0 0 20px rgba(180,120,20,.15),inset 0 1px 0 rgba(255,200,80,.04);
+}
+.btn:hover { color:#F0D060; border-color:#B08030; box-shadow:0 0 35px rgba(200,150,30,.35); background:rgba(180,120,20,.07); }
+.btn-sm { font-size:11px; padding:7px 18px; }
 
-    #game-wrapper {
-      position: relative;
-      width: 800px;
-      height: 600px;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
+/* ── GAME ───────────────────────────────────────────────── */
+#game { position:fixed; inset:0; display:none; }
+#c { display:block; }
 
-    #game-container {
-      width: 100%;
-      height: 100%;
-    }
+/* ── HUD ────────────────────────────────────────────────── */
+#hud {
+  position:fixed; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:10px 14px; pointer-events:none; z-index:20;
+}
+.hpanel {
+  background:var(--panel); border:1px solid var(--border); border-radius:3px;
+  padding:7px 13px; box-shadow:0 2px 16px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,200,60,.05);
+}
+#hud-loc-label { font-family:'Cinzel',serif; font-size:9px; color:var(--gold2); letter-spacing:.14em; text-transform:uppercase; margin-bottom:2px; }
+#hud-loc-name  { font-family:'IM Fell English',serif; font-size:14px; color:var(--gold); font-style:italic; text-shadow:0 0 8px rgba(200,150,30,.4); }
+.hq { text-align:right; max-width:250px; }
+.hq-l { font-family:'Cinzel',serif; font-size:9px; color:#6A4A18; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
+#hud-qt { font-size:12px; color:#C4A060; font-style:italic; line-height:1.4; }
+#hud-qt.done { color:#70B870; }
 
-    /* ─── HUD ─────────────────────────────────────────── */
-    #hud {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 10px 14px;
-      pointer-events: none;
-      z-index: 10;
-    }
+/* ── MINIMAP ─────────────────────────────────────────────── */
+#mm-wrap {
+  position:fixed; bottom:50px; right:14px;
+  background:var(--panel); border:1px solid var(--border); border-radius:3px;
+  padding:6px; z-index:20; box-shadow:0 2px 16px rgba(0,0,0,.7);
+}
+#mm-title { font-family:'Cinzel',serif; font-size:8px; color:#6A4A18; letter-spacing:.1em; text-transform:uppercase; text-align:center; margin-bottom:4px; }
+#minimap { display:block; }
 
-    .hud-panel {
-      background: linear-gradient(135deg, rgba(10,8,4,0.88) 0%, rgba(30,20,8,0.82) 100%);
-      border: 1px solid #6b4e1a;
-      border-radius: 4px;
-      padding: 6px 12px;
-      box-shadow: 0 0 12px rgba(180,120,20,0.25), inset 0 1px 0 rgba(255,200,80,0.08);
-    }
+/* ── NOTIF ──────────────────────────────────────────────── */
+#notif {
+  display:none; position:fixed; top:62px; left:50%; transform:translateX(-50%);
+  background:var(--panel); border:1px solid #607A28; border-radius:3px;
+  padding:7px 18px; font-style:italic; font-size:13px; color:#A0C870;
+  z-index:40; pointer-events:none; white-space:nowrap;
+  box-shadow:0 0 14px rgba(90,150,20,.3);
+}
+#notif.w { border-color:#7A5020; color:#D4A060; }
 
-    #hud-location {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      color: #e8c96a;
-      letter-spacing: 0.05em;
-      text-shadow: 0 0 8px rgba(230,180,50,0.5);
-    }
+/* ── DIALOGUE ────────────────────────────────────────────── */
+#dlg-wrap { display:none; position:fixed; bottom:0; left:0; right:0; z-index:30; padding:0 14px 14px; }
+#dlg-box {
+  background:linear-gradient(180deg,rgba(8,6,2,.98) 0%,rgba(16,11,4,.99) 100%);
+  border:1px solid var(--border); border-top:2px solid #9B6E2A;
+  border-radius:5px 5px 3px 3px; padding:16px 20px 14px;
+  box-shadow:0 -6px 40px rgba(0,0,0,.85),0 0 24px rgba(160,100,20,.12);
+  position:relative; max-width:760px; margin:0 auto;
+}
+#dlg-box::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,150,50,.5),transparent);
+}
+#dlg-hdr { display:flex; align-items:flex-start; gap:14px; margin-bottom:10px; }
+#dlg-portrait {
+  width:52px; height:52px; flex-shrink:0;
+  border:1px solid var(--border); border-radius:3px;
+  background:rgba(20,14,4,.8); overflow:hidden;
+}
+#dlg-portrait canvas { display:block; }
+#dlg-nname { font-family:'Cinzel',serif; font-size:15px; font-weight:700; color:#E8C050; letter-spacing:.04em; text-shadow:0 0 12px rgba(220,170,40,.35); margin-bottom:2px; }
+#dlg-nrole { font-size:11px; color:#7A5820; font-style:italic; }
+#dlg-text  { font-size:14px; color:var(--text); line-height:1.65; margin-bottom:14px; min-height:42px; border-left:2px solid rgba(120,80,20,.3); padding-left:12px; }
+#dlg-opts  { display:flex; flex-direction:column; gap:5px; }
+.dopt {
+  font-family:'IM Fell English',serif; font-style:italic; font-size:13px;
+  color:#A08850; background:transparent; border:none; border-left:2px solid #4A3410;
+  padding:5px 12px; cursor:pointer; text-align:left; transition:all .15s; border-radius:0 3px 3px 0;
+}
+.dopt:hover { color:#F0D070; border-left-color:#C09030; background:rgba(180,120,20,.08); padding-left:16px; }
+.dopt::before { content:'▸  '; color:#5A3A10; font-style:normal; font-size:10px; }
+.dopt:hover::before { color:#D0A030; }
+#dlg-esc { position:absolute; top:10px; right:14px; font-size:10px; color:#4A3218; font-style:italic; }
 
-    #hud-location span {
-      color: #c49a30;
-      font-size: 11px;
-      display: block;
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      margin-top: 1px;
-    }
-
-    #hud-quest {
-      font-family: 'IM Fell English', serif;
-      font-size: 12px;
-      color: #b89a6a;
-      max-width: 240px;
-      text-align: right;
-    }
-
-    #hud-quest .quest-label {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      color: #8b6a2a;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    #hud-quest .quest-text {
-      color: #d4b87a;
-    }
-
-    #hud-quest .quest-done {
-      color: #7ab87a;
-    }
-
-    /* ─── CONTROLS HINT ───────────────────────────────── */
-    #controls-hint {
-      position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 11px;
-      color: rgba(180,150,80,0.5);
-      pointer-events: none;
-      z-index: 10;
-      white-space: nowrap;
-    }
-
-    /* ─── DIALOGUE BOX ────────────────────────────────── */
-    #dialogue-overlay {
-      display: none;
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      z-index: 20;
-      padding: 0 12px 14px;
-    }
-
-    #dialogue-box {
-      background: linear-gradient(180deg, rgba(8,6,2,0.97) 0%, rgba(18,12,4,0.98) 100%);
-      border: 1px solid #6b4e1a;
-      border-top: 2px solid #9b6e2a;
-      border-radius: 6px 6px 4px 4px;
-      padding: 14px 18px 12px;
-      box-shadow: 0 -4px 30px rgba(0,0,0,0.8), 0 0 20px rgba(180,120,20,0.15);
-      position: relative;
-    }
-
-    #dialogue-box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(200,160,60,0.6), transparent);
-    }
-
-    #dialogue-npc-name {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      font-weight: 700;
-      color: #e8c050;
-      margin-bottom: 8px;
-      text-shadow: 0 0 10px rgba(230,180,50,0.4);
-      letter-spacing: 0.04em;
-    }
-
-    #dialogue-text {
-      font-family: 'IM Fell English', serif;
-      font-size: 14px;
-      color: #c8b490;
-      line-height: 1.55;
-      margin-bottom: 12px;
-      min-height: 40px;
-    }
-
-    #dialogue-options {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .dialogue-btn {
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 13px;
-      color: #a88a50;
-      background: transparent;
-      border: none;
-      border-left: 2px solid #5a3e12;
-      padding: 4px 10px;
-      cursor: pointer;
-      text-align: left;
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
-      border-radius: 0 3px 3px 0;
-    }
-
-    .dialogue-btn:hover {
-      color: #f0d070;
-      border-left-color: #c09030;
-      background: rgba(180,120,20,0.07);
-    }
-
-    .dialogue-btn::before {
-      content: '› ';
-      color: #6a4a1a;
-      font-style: normal;
-    }
-
-    .dialogue-btn:hover::before {
-      color: #d0a030;
-    }
-
-    /* ─── NOTIFICATION ────────────────────────────────── */
-    #notification {
-      display: none;
-      position: absolute;
-      top: 56px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(8,6,2,0.92);
-      border: 1px solid #6b8a2a;
-      border-radius: 4px;
-      padding: 6px 16px;
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 13px;
-      color: #a8c870;
-      z-index: 30;
-      text-align: center;
-      box-shadow: 0 0 12px rgba(100,160,30,0.3);
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    /* ─── TITLE SCREEN ────────────────────────────────── */
-    #title-screen {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 40%, rgba(40,25,5,1) 0%, rgba(5,3,1,1) 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-
-    #title-screen h1 {
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      font-size: 38px;
-      color: #d4a830;
-      letter-spacing: 0.12em;
-      text-shadow: 0 0 30px rgba(200,140,20,0.6), 0 2px 0 rgba(0,0,0,0.8);
-      margin-bottom: 6px;
-    }
-
-    #title-screen .subtitle {
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 16px;
-      color: #8a6a30;
-      letter-spacing: 0.08em;
-      margin-bottom: 50px;
-    }
-
-    #title-screen .flavor {
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 13px;
-      color: #5a4820;
-      max-width: 360px;
-      text-align: center;
-      line-height: 1.7;
-      margin-bottom: 48px;
-    }
-
-    #start-btn {
-      font-family: 'Cinzel', serif;
-      font-size: 15px;
-      letter-spacing: 0.14em;
-      color: #c8a040;
-      background: transparent;
-      border: 1px solid #6b4e1a;
-      border-radius: 3px;
-      padding: 10px 32px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-transform: uppercase;
-      box-shadow: 0 0 15px rgba(180,120,20,0.2);
-    }
-
-    #start-btn:hover {
-      color: #f0d060;
-      border-color: #c09030;
-      box-shadow: 0 0 25px rgba(200,150,30,0.4);
-      background: rgba(180,120,20,0.08);
-    }
-
-    .divider {
-      width: 200px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(180,120,20,0.5), transparent);
-      margin: 20px auto;
-    }
-  </style>
+/* ── BACK / CTRL ─────────────────────────────────────────── */
+#back-btn { position:fixed; bottom:12px; right:14px; pointer-events:all; z-index:30; }
+#ctrl { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); font-style:italic; font-size:10px; color:rgba(160,130,65,.42); pointer-events:none; z-index:20; white-space:nowrap; }
+</style>
 </head>
 <body>
-<div id="game-wrapper">
-  <div id="game-container"></div>
 
-  <!-- TITLE SCREEN -->
-  <div id="title-screen">
-    <h1>КОЛОНИЯ</h1>
-    <div class="subtitle">За Барьером</div>
-    <div class="divider"></div>
-    <div class="flavor">
-      Магический барьер опустился над шахтами.<br>
-      Выхода нет. Есть только три лагеря —<br>
-      и бесконечная руда под ногами.
-    </div>
-    <button id="start-btn" onclick="startGame()">Войти в колонию</button>
+<!-- TITLE -->
+<div id="title">
+  <div class="t-rune">✦ Магический барьер — Колония — Заключённые ✦</div>
+  <h1>КОЛОНИЯ</h1>
+  <div class="t-sub">— За Барьером —</div>
+  <div class="t-div"></div>
+  <div class="t-lore">
+    Магический барьер опустился над шахтами.<br>
+    Выхода нет. Три лагеря — три пути.<br>
+    Ты — заключённый без имени.<br><br>
+    <em style="color:#3A2A10;font-size:.9em">Что ты сделаешь, чтобы выжить?</em>
   </div>
-
-  <!-- HUD -->
-  <div id="hud">
-    <div class="hud-panel">
-      <div id="hud-location">
-        ТЕРРИТОРИЯ
-        <span id="hud-location-name">Нейтральная зона</span>
-      </div>
-    </div>
-    <div class="hud-panel">
-      <div id="hud-quest">
-        <div class="quest-label">Задание</div>
-        <div class="quest-text" id="hud-quest-text">Нет активных заданий</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTIFICATION -->
-  <div id="notification"></div>
-
-  <!-- DIALOGUE -->
-  <div id="dialogue-overlay">
-    <div id="dialogue-box">
-      <div id="dialogue-npc-name"></div>
-      <div id="dialogue-text"></div>
-      <div id="dialogue-options"></div>
-    </div>
-  </div>
-
-  <!-- CONTROLS -->
-  <div id="controls-hint">WASD / ↑↓←→ — движение &nbsp;|&nbsp; E — взаимодействие &nbsp;|&nbsp; Esc — закрыть диалог</div>
+  <button class="btn" id="start-btn">⚔ Войти в колонию</button>
 </div>
 
-<!-- Phaser 3 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-<script src="main.js"></script>
+<!-- GAME -->
+<div id="game">
+  <canvas id="c"></canvas>
+
+  <div id="hud">
+    <div class="hpanel">
+      <div id="hud-loc-label">Территория</div>
+      <div id="hud-loc-name">Нейтральная зона</div>
+    </div>
+    <div class="hpanel hq">
+      <div class="hq-l">Задание</div>
+      <div id="hud-qt">Нет активных заданий</div>
+    </div>
+  </div>
+
+  <div id="mm-wrap">
+    <div id="mm-title">Карта колонии</div>
+    <canvas id="minimap" width="130" height="98"></canvas>
+  </div>
+
+  <div id="notif"></div>
+
+  <div id="dlg-wrap">
+    <div id="dlg-box">
+      <div id="dlg-esc">Esc — закрыть</div>
+      <div id="dlg-hdr">
+        <div id="dlg-portrait"><canvas id="portrait-c" width="52" height="52"></canvas></div>
+        <div><div id="dlg-nname"></div><div id="dlg-nrole"></div></div>
+      </div>
+      <div id="dlg-text"></div>
+      <div id="dlg-opts"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-sm" id="back-btn" onclick="backToTitle()">◂ Выйти</button>
+  <div id="ctrl">WASD / ↑↓←→ — движение &nbsp;|&nbsp; E — разговор &nbsp;|&nbsp; Esc — закрыть диалог</div>
+</div>
+
+<script src="data.js"></script>
+<script src="renderer.js"></script>
 <script>
-  function startGame() {
-    document.getElementById('title-screen').style.display = 'none';
-    if (window.gameInstance) {
-      window.gameInstance.scene.start('GameScene');
+// ═══════════════════════════════════════════════════════════
+//  engine — Игровой движок
+// ═══════════════════════════════════════════════════════════
+const VW = 800, VH = 600;
+
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const mmC    = document.getElementById('minimap');
+const mmCtx  = mmC.getContext('2d');
+
+function resize() {
+  const r = Math.min(window.innerWidth/VW, window.innerHeight/VH);
+  canvas.style.width  = (VW*r)+'px';
+  canvas.style.height = (VH*r)+'px';
+  canvas.width = VW; canvas.height = VH;
+}
+window.addEventListener('resize', resize);
+
+// ── STATE ──────────────────────────────────────────────────
+const G = {
+  running: false, t: 0,
+  questState: 'none',   // none | active | found | done
+  cam: {x:0,y:0},
+  player: {x:600,y:530,facing:'down',moving:false},
+  keys: {},
+  dlgOpen: false, dlgNPC: null,
+  lastTime: 0, notifTimer: null,
+  visitedZones: new Set(),
+};
+
+// ── INPUT ──────────────────────────────────────────────────
+window.addEventListener('keydown', e => {
+  G.keys[e.code] = true;
+  if (e.code==='KeyE' && !G.dlgOpen) { tryInteract(); e.preventDefault(); }
+  if (e.code==='Escape' && G.dlgOpen) { closeDlg(); e.preventDefault(); }
+});
+window.addEventListener('keyup', e => G.keys[e.code] = false);
+
+// ── COLLISION ─────────────────────────────────────────────
+function collides(nx, ny) {
+  if (nx<28||nx>WORLD.W-28||ny<28||ny>WORLD.H-28) return true;
+  for (const b of BUILDINGS) {
+    const cx = Math.max(b.x+2, Math.min(nx, b.x+b.w-2));
+    const cy = Math.max(b.y+2, Math.min(ny, b.y+b.h-2));
+    if (Math.hypot(nx-cx, ny-cy) < WORLD.PLAYER_R+1) return true;
+  }
+  return false;
+}
+
+// ── ZONE ──────────────────────────────────────────────────
+function getZone(px, py) {
+  for (const z of ZONES) {
+    if (px>=z.x&&px<=z.x+z.w&&py>=z.y&&py<=z.y+z.h) return z.name;
+  }
+  return 'Нейтральная зона';
+}
+
+// ── HUD ───────────────────────────────────────────────────
+let _lz='', _hudT=0;
+function updateHUD() {
+  const zone = getZone(G.player.x, G.player.y);
+  document.getElementById('hud-loc-name').textContent = zone;
+  if (zone !== _lz) {
+    if (zone!=='Нейтральная зона' && !G.visitedZones.has(zone)) {
+      G.visitedZones.add(zone);
+      notify('Вы вошли в: '+zone);
     }
+    _lz = zone;
+  }
+  const el = document.getElementById('hud-qt');
+  const map = {
+    none:  ['Нет активных заданий',''],
+    active:['Найди Кривого Торса у Башни стражи',''],
+    found: ['Торс найден — вернись к Рагнару',''],
+    done:  ['✓ Квест завершён','done'],
+  };
+  const [txt,cls] = map[G.questState]||map.none;
+  el.textContent=txt; el.className=cls;
+}
+
+// ── MINIMAP ────────────────────────────────────────────────
+const MM_W=130, MM_H=98;
+const SX=MM_W/WORLD.W, SY=MM_H/WORLD.H;
+const MM_ZONE_CLR = { old:'#5A2808',new:'#0C3A0C',cult:'#280650',mine:'#3A2A10',ruins:'#2A2010' };
+
+function drawMinimap() {
+  mmCtx.fillStyle='#0E0C08'; mmCtx.fillRect(0,0,MM_W,MM_H);
+  for(const z of ZONES){ mmCtx.fillStyle=MM_ZONE_CLR[z.theme]||'#1A1808'; mmCtx.fillRect(z.x*SX,z.y*SY,z.w*SX,z.h*SY); }
+  mmCtx.fillStyle='#6A4A18';
+  for(const b of BUILDINGS) mmCtx.fillRect(b.x*SX,b.y*SY,Math.max(2,b.w*SX),Math.max(2,b.h*SY));
+  // River
+  mmCtx.fillStyle='#1A3050'; mmCtx.fillRect(1180*SX,480*SY,20*SX,(MM_H-480*SY));
+  mmCtx.strokeStyle='rgba(60,120,255,.5)'; mmCtx.lineWidth=1; mmCtx.strokeRect(1,1,MM_W-2,MM_H-2);
+  // NPCs
+  for(const n of NPC_DATA){
+    mmCtx.fillStyle = n.role==='mage'?'#4080FF':n.role==='shaman'?'#A030D0':'#C08830';
+    mmCtx.beginPath(); mmCtx.arc(n.x*SX,n.y*SY,1.5,0,Math.PI*2); mmCtx.fill();
+  }
+  // Player
+  mmCtx.fillStyle='#FFE050'; mmCtx.shadowColor='#FFD700'; mmCtx.shadowBlur=4;
+  mmCtx.beginPath(); mmCtx.arc(G.player.x*SX,G.player.y*SY,3,0,Math.PI*2); mmCtx.fill();
+  mmCtx.shadowBlur=0;
+}
+
+// ── DIALOGUE ──────────────────────────────────────────────
+const ROLES = { warrior:'Воин',mage:'Маг',shaman:'Жрец',worker:'Рабочий',merchant:'Торговец',thug:'Головорез',prisoner:'Заключённый' };
+
+function tryInteract() {
+  let best=null, bd=WORLD.INTERACT_R;
+  for(const n of NPC_DATA){ const d=Math.hypot(G.player.x-n.x,G.player.y-n.y); if(d<bd){best=n;bd=d;} }
+  if(best) openDlg(best);
+}
+
+function getBranch(n) {
+  const s=G.questState;
+  if(n.id==='captain'){ if(s==='active'||s==='found') return n.dialogues.quest_active||n.dialogues.default; if(s==='done') return n.dialogues.quest_done; }
+  if(n.id==='tors' && s==='done') return n.dialogues.quest_done;
+  return n.dialogues.default;
+}
+
+function openDlg(n) {
+  G.dlgOpen=true; G.dlgNPC=n;
+  document.getElementById('dlg-nname').textContent=n.name;
+  document.getElementById('dlg-nrole').textContent=ROLES[n.role]||'Житель колонии';
+  drawPortrait(n);
+  renderBranch(n, getBranch(n));
+  document.getElementById('dlg-wrap').style.display='block';
+}
+
+function drawPortrait(n) {
+  const pc=document.getElementById('portrait-c');
+  const pctx=pc.getContext('2d');
+  pctx.clearRect(0,0,52,52);
+  pctx.fillStyle='rgba(15,10,4,1)'; pctx.fillRect(0,0,52,52);
+  const cfg={...n,scale:1};
+  switch(n.role){
+    case'mage':   drawMage   (pctx,26,36,cfg,'down',false,G.t); break;
+    case'shaman': drawShaman (pctx,26,36,cfg,'down',false,G.t); break;
+    case'warrior':drawWarrior(pctx,26,36,cfg,'down',false,G.t); break;
+    default:      drawHuman  (pctx,26,36,cfg,'down',false,G.t); break;
+  }
+}
+
+function renderBranch(n, b) {
+  document.getElementById('dlg-text').textContent=b.text;
+  const el=document.getElementById('dlg-opts'); el.innerHTML='';
+  for(const o of b.opts){
+    const btn=document.createElement('button');
+    btn.className='dopt'; btn.textContent=o.l;
+    btn.onclick=()=>handleOpt(n,o);
+    el.appendChild(btn);
+  }
+}
+
+function handleOpt(n,o) {
+  if(o.act==='ACCEPT'){ G.questState='active'; updateHUD(); notify('Задание принято: найди Кривого Торса у Башни стражи'); }
+  if(o.act==='COMPLETE'){ G.questState='found'; updateHUD(); notify('✓ Торс найден! Вернись к Рагнару'); }
+  if(o.go && n.dialogues[o.go]){ renderBranch(n,n.dialogues[o.go]); drawPortrait(n); return; }
+  closeDlg();
+}
+
+function closeDlg() {
+  G.dlgOpen=false; G.dlgNPC=null;
+  document.getElementById('dlg-wrap').style.display='none';
+}
+
+// ── NOTIFY ────────────────────────────────────────────────
+function notify(msg,type='') {
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.className=type; el.style.display='block';
+  clearTimeout(G.notifTimer);
+  G.notifTimer=setTimeout(()=>el.style.display='none',3800);
+}
+
+// ── QUEST MARKER ──────────────────────────────────────────
+function drawQuestMarker(x,y,sym,color,t) {
+  const b=Math.sin(t*3)*3;
+  ctx.save(); ctx.translate(x-G.cam.x, y-G.cam.y+b);
+  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10;
+  ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.font='bold 12px Georgia'; ctx.fillStyle='#000';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(sym,0,0); ctx.textBaseline='alphabetic';
+  ctx.restore();
+}
+
+// ── VIGNETTE ──────────────────────────────────────────────
+function drawVignette() {
+  const g=ctx.createRadialGradient(VW/2,VH/2,VH*.28,VW/2,VH/2,VH*.82);
+  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.58)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,VW,VH);
+}
+
+// ── GAME LOOP ──────────────────────────────────────────────
+function loop(ts) {
+  if(!G.running) return;
+  requestAnimationFrame(loop);
+  const dt=Math.min((ts-G.lastTime)/1000,.05);
+  G.lastTime=ts; G.t=ts/1000;
+
+  // Movement
+  if(!G.dlgOpen){
+    let vx=0,vy=0;
+    if(G.keys['ArrowLeft'] ||G.keys['KeyA']){vx-=1;G.player.facing='left';}
+    if(G.keys['ArrowRight']||G.keys['KeyD']){vx+=1;G.player.facing='right';}
+    if(G.keys['ArrowUp']   ||G.keys['KeyW']){vy-=1;G.player.facing='up';}
+    if(G.keys['ArrowDown'] ||G.keys['KeyS']){vy+=1;G.player.facing='down';}
+    if(vx!==0&&vy!==0){vx*=.707;vy*=.707;}
+    G.player.moving=(vx!==0||vy!==0);
+    if(G.player.moving){
+      const spd=WORLD.PLAYER_SPEED*dt;
+      const nx=G.player.x+vx*spd, ny=G.player.y+vy*spd;
+      if(!collides(nx,G.player.y)) G.player.x=nx;
+      if(!collides(G.player.x,ny)) G.player.y=ny;
+    }
+  } else { G.player.moving=false; }
+
+  // Camera
+  G.cam.x=Math.max(0,Math.min(G.player.x-VW/2,WORLD.W-VW));
+  G.cam.y=Math.max(0,Math.min(G.player.y-VH/2,WORLD.H-VH));
+
+  // HUD throttle
+  _hudT+=dt; if(_hudT>.18){_hudT=0;updateHUD();}
+
+  // ── RENDER ──────────────────────────────────────────────
+  ctx.clearRect(0,0,VW,VH);
+  renderWorld(ctx, G.cam.x, G.cam.y, G.t);
+
+  // Quest markers (screen space)
+  for(const n of NPC_DATA){
+    if(n.id==='captain'&&G.questState==='none') drawQuestMarker(n.x,n.y-42,'!','#FFD700',G.t);
+    if(n.id==='tors'&&G.questState==='active')  drawQuestMarker(n.x,n.y-42,'?','#60C0FF',G.t);
+    if(n.id==='captain'&&G.questState==='found') drawQuestMarker(n.x,n.y-42,'!','#80FF80',G.t);
   }
 
-  // ── Telegram Mini App integration (раскомментируй при деплое) ──
-  // window.TelegramUserId = null;
-  // if (window.Telegram && window.Telegram.WebApp) {
-  //   const tg = window.Telegram.WebApp;
-  //   tg.ready();
-  //   tg.expand();
-  //   tg.enableClosingConfirmation();
-  //   const user = tg.initDataUnsafe?.user;
-  //   if (user) {
-  //     window.TelegramUserId = user.id;
-  //     window.TelegramUserName = user.first_name || 'Заключённый';
-  //   }
-  // }
-  // Также можно передать userId через URL: ?userId=12345
-  // const urlParams = new URLSearchParams(window.location.search);
-  // if (urlParams.get('userId')) window.TelegramUserId = urlParams.get('userId');
+  // NPCs & player (world space)
+  ctx.save(); ctx.translate(-G.cam.x,-G.cam.y);
+  for(const n of NPC_DATA){
+    const near=Math.hypot(G.player.x-n.x,G.player.y-n.y)<WORLD.INTERACT_R;
+    renderNPC(ctx,n,near,G.t);
+  }
+  renderPlayer(ctx,G.player.x,G.player.y,G.player.moving,G.player.facing,G.t);
+  ctx.restore();
+
+  // Minimap + vignette
+  drawMinimap();
+  drawVignette();
+
+  // Portrait live update
+  if(G.dlgOpen&&G.dlgNPC) drawPortrait(G.dlgNPC);
+}
+
+// ── START / BACK ──────────────────────────────────────────
+document.getElementById('start-btn').onclick = function(){
+  document.getElementById('title').style.display='none';
+  document.getElementById('game').style.display='block';
+  resize();
+  Object.assign(G,{running:true,t:0,questState:'none',keys:{},dlgOpen:false,dlgNPC:null,visitedZones:new Set()});
+  G.player.x=600; G.player.y=530; G.player.facing='down';
+  _lz=''; updateHUD();
+  G.lastTime=performance.now();
+  requestAnimationFrame(loop);
+};
+
+function backToTitle(){
+  G.running=false; G.keys={};
+  closeDlg();
+  document.getElementById('game').style.display='none';
+  document.getElementById('title').style.display='flex';
+}
+
+window.addEventListener('load',resize);
 </script>
 </body>
 </html>
