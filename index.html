@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Готика: Лагерь Угольной Ямы</title>
 
-  <!-- Telegram Mini App SDK -->
+  <!-- Telegram Mini App SDK (не мешает в обычном браузере) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Phaser 3 -->
@@ -25,19 +25,18 @@
 
   if (window.Telegram && window.Telegram.WebApp) {
     webApp = window.Telegram.WebApp;
-    webApp.ready();              // Готово к работе
-    webApp.expand();             // Разворачиваем на весь экран
+    webApp.ready();
+    webApp.expand();
     tgUser = webApp.initDataUnsafe?.user || null;
-
-    // Настройка внешнего вида
-    webApp.setHeaderColor('#000000');
-    webApp.setBackgroundColor('#000000');
+    try {
+      webApp.setHeaderColor('#000000');
+      webApp.setBackgroundColor('#000000');
+    } catch (e) {}
   }
 
   const W = window.innerWidth;
   const H = window.innerHeight;
 
-  // Игровое состояние
   const gs = {
     scene: 'camp',
     questStage: 0,
@@ -51,43 +50,44 @@
     items: []
   };
 
-  // Диалоги
   function getDialogue(npc) {
     if (npc === 'liard') {
       if (gs.questStage === 0) {
         gs.questStage = 1;
         return [
-          ['ЛИАРД', 'Новенький, да? Не торопись умирать — тут свои правила.'],
-          ['ЛИАРД', 'Я — Лиард. Этот лагерь держится на мне и на руде для короля.'],
-          ['ЛИАРД', 'В шахте творится что-то странное. Люди уходят — не возвращаются.'],
-          ['ЛИАРД', 'Сходи, посмотри. Принеси доказательства. Выживешь — награжу.'],
-          ['★ ЗАДАНИЕ', 'Получен квест: «Шёпот из шахты»']
+          ['ЛИАРД','Новенький, да? Не торопись умирать — тут свои правила.'],
+          ['ЛИАРД','Я — Лиард. Этот лагерь держится на мне и на руде для короля.'],
+          ['ЛИАРД','В шахте творится что-то странное. Люди уходят — не возвращаются.'],
+          ['ЛИАРД','Сходи, посмотри. Принеси доказательства. Выживешь — награжу.'],
+          ['★ ЗАДАНИЕ','Получен квест: «Шёпот из шахты»']
         ];
       }
-      if (gs.questStage === 1) return [['ЛИАРД', 'Ты ещё здесь? Иди в шахту, мне нужны доказательства.']];
+      if (gs.questStage === 1)
+        return [['ЛИАРД','Ты ещё здесь? Иди в шахту, мне нужны доказательства.']];
       if (gs.questStage === 2 && !gs.returnedLiard) {
         gs.returnedLiard = true;
         gs.items.push('Благодарность Лиарда');
         if (gs.returnedKorin) gs.questStage = 3;
         return [
-          ['ГЕРОЙ', 'Я вернулся. Нашёл странную руду и следы борьбы.'],
-          ['ЛИАРД', '…Чёрт. Это не та руда. Свет в ней — будто живой.'],
-          ['ЛИАРД', 'Ты ничего не видел. За смелость — держи.'],
-          ['★ ПОЛУЧЕНО', 'Благодарность Лиарда']
+          ['ГЕРОЙ','Я вернулся. Нашёл странную руду и следы борьбы.'],
+          ['ЛИАРД','…Чёрт. Это не та руда. Свет в ней — будто живой.'],
+          ['ЛИАРД','Ты ничего не видел. За смелость — держи.'],
+          ['★ ПОЛУЧЕНО','Благодарность Лиарда']
         ];
       }
-      return [['ЛИАРД', 'Хорошая работа. Молчи о том, что видел в шахте.']];
+      return [['ЛИАРД','Хорошая работа. Молчи о том, что видел в шахте.']];
     }
     if (npc === 'korin') {
-      if (gs.questStage === 0) return [['КОРИН', 'Сначала поговори с Лиардом у костра.']];
+      if (gs.questStage === 0)
+        return [['КОРИН','Сначала поговори с Лиардом у костра.']];
       if (gs.questStage === 1 && !gs.talkedKorin) {
         gs.talkedKorin = true;
         return [
-          ['КОРИН', 'Значит, Лиард послал тебя в шахту. Понимаешь, что там?'],
-          ['КОРИН', 'Люди уходят вниз и не возвращаются. Крепкие мужики.'],
-          ['КОРИН', 'Там внизу что-то ходит. Или шепчет. Не знаю, что хуже.'],
-          ['КОРИН', 'Если пойдёшь — найди медный амулет моего товарища. Пожалуйста.'],
-          ['★ ПОДЗАДАЧА', 'Найти амулет шахтёра в шахте']
+          ['КОРИН','Значит, Лиард послал тебя в шахту. Понимаешь, что там?'],
+          ['КОРИН','Люди уходят вниз и не возвращаются. Крепкие мужики.'],
+          ['КОРИН','Там внизу что-то ходит. Или шепчет. Не знаю, что хуже.'],
+          ['КОРИН','Если пойдёшь — найди медный амулет моего товарища. Пожалуйста.'],
+          ['★ ПОДЗАДАЧА','Найти амулет шахтёра в шахте']
         ];
       }
       if (gs.questStage >= 2 && gs.hasAmulet && !gs.returnedKorin) {
@@ -95,98 +95,78 @@
         gs.items.push('Фляга Корина');
         if (gs.returnedLiard) gs.questStage = 3;
         return [
-          ['ГЕРОЙ', 'Я нашёл его амулет. Был на сломанной балке в глубине.'],
-          ['КОРИН', '…Да. Это его. Спасибо, парень.'],
-          ['КОРИН', 'В этой дыре память ничего не стоит, но для меня это важно.'],
-          ['★ ПОЛУЧЕНО', 'Фляга Корина']
+          ['ГЕРОЙ','Я нашёл его амулет. Был на сломанной балке в глубине.'],
+          ['КОРИН','…Да. Это его. Спасибо, парень.'],
+          ['КОРИН','В этой дыре память ничего не стоит, но для меня это важно.'],
+          ['★ ПОЛУЧЕНО','Фляга Корина']
         ];
       }
-      if (gs.questStage === 3 || gs.returnedKorin) return [['КОРИН', 'Береги себя. Выжить здесь — уже победа.']];
-      return [['КОРИН', 'Иди в шахту. Но будь осторожен — там не всё то, чем кажется.']];
+      if (gs.questStage === 3 || gs.returnedKorin)
+        return [['КОРИН','Береги себя. Выжить здесь — уже победа.']];
+      return [['КОРИН','Иди в шахту. Но будь осторожен — там не всё то, чем кажется.']];
     }
     if (npc === 'ela') {
       if (!gs.talkedEla) {
         gs.talkedEla = true;
         return [
-          ['ЭЛА', 'О, свежее мясо. Я — Эла. Торгую всем: едой, травами, информацией.'],
-          ['ЭЛА', 'Совет бесплатно: не верь Лиарду больше, чем нужно.']
+          ['ЭЛА','О, свежее мясо. Я — Эла. Торгую всем: едой, травами, информацией.'],
+          ['ЭЛА','Совет бесплатно: не верь Лиарду больше, чем нужно.']
         ];
       }
-      if (gs.questStage >= 2 && gs.hasOre) return [['ЭЛА', 'Что это у тебя? Странная руда? В долине есть люди, которые ищут такие вещи. Много платят.']];
-      return [['ЭЛА', 'Смотри и слушай — это здесь полезнее всего.']];
+      if (gs.questStage >= 2 && gs.hasOre)
+        return [['ЭЛА','Что это у тебя? Странная руда? В долине есть люди, которые ищут такие вещи. Много платят.']];
+      return [['ЭЛА','Смотри и слушай — это здесь полезнее всего.']];
     }
     if (npc === 'ran') {
       if (!gs.talkedRan) {
         gs.talkedRan = true;
         return [
-          ['РАН', 'Стой. Я — Ран, стражник короля.'],
-          ['РАН', 'Делай своё дело, не создавай проблем — поладим.'],
-          ['РАН', '…Хотя между нами — это место мне самому не нравится.']
+          ['РАН','Стой. Я — Ран, стражник короля.'],
+          ['РАН','Делай своё дело, не создавай проблем — поладим.'],
+          ['РАН','…Хотя между нами — это место мне самому не нравится.']
         ];
       }
-      if (gs.questStage >= 2) return [['РАН', 'Ты ходил в шахту и вернулся живым. Хороший знак.'], ['РАН', 'Король об этом не знает… или не хочет знать.']];
-      return [['РАН', 'Держись подальше от неприятностей. Здесь легко пропасть.']];
+      if (gs.questStage >= 2)
+        return [['РАН','Ты ходил в шахту и вернулся живым. Хороший знак.'],
+                ['РАН','Король об этом не знает… или не хочет знать.']];
+      return [['РАН','Держись подальше от неприятностей. Здесь легко пропасть.']];
     }
     return [];
   }
 
-  // Пиксельная графика персонажей
-  function drawChar(g, cx, cy, cfg) {
-    const s = cfg.scale || 1;
-    // Тень
-    g.fillStyle(0x000000, 0.25);
-    g.fillEllipse(cx, cy + 16 * s, 28 * s, 8 * s);
-    // Ноги
-    g.fillStyle(cfg.legColor || 0x333333);
-    g.fillRect(cx - 7 * s, cy + 6 * s, 6 * s, 10 * s);
-    g.fillRect(cx + 1 * s, cy + 6 * s, 6 * s, 10 * s);
-    // Обувь
-    g.fillStyle(cfg.shoeColor || 0x222222);
-    g.fillRect(cx - 8 * s, cy + 14 * s, 8 * s, 4 * s);
-    g.fillRect(cx, cy + 14 * s, 8 * s, 4 * s);
-    // Тело
-    g.fillStyle(cfg.bodyColor || 0x556644);
-    g.fillRect(cx - 9 * s, cy - 8 * s, 18 * s, 16 * s);
-    // Пояс
-    g.fillStyle(cfg.beltColor || 0x8B6914);
-    g.fillRect(cx - 9 * s, cy + 2 * s, 18 * s, 3 * s);
-    // Руки
-    g.fillStyle(cfg.bodyColor || 0x556644);
-    g.fillRect(cx - 14 * s, cy - 8 * s, 6 * s, 12 * s);
-    g.fillRect(cx + 8 * s, cy - 8 * s, 6 * s, 12 * s);
-    // Кисти
-    g.fillStyle(cfg.skinColor || 0xF4C080);
-    g.fillEllipse(cx - 11 * s, cy + 5 * s, 8 * s, 8 * s);
-    g.fillEllipse(cx + 11 * s, cy + 5 * s, 8 * s, 8 * s);
-    // Шея
-    g.fillStyle(cfg.skinColor || 0xF4C080);
-    g.fillRect(cx - 3 * s, cy - 12 * s, 6 * s, 5 * s);
-    // Голова
-    g.fillStyle(cfg.skinColor || 0xF4C080);
-    g.fillEllipse(cx, cy - 18 * s, 18 * s, 18 * s);
-    // Волосы
-    g.fillStyle(cfg.hairColor || 0x3A2010);
-    g.fillRect(cx - 9 * s, cy - 26 * s, 18 * s, 10 * s);
-    // Глаза
+  function drawChar(g,cx,cy,cfg){
+    const s=cfg.scale||1;
+    g.fillStyle(0x000000,0.25);g.fillEllipse(cx,cy+16*s,28*s,8*s);
+    g.fillStyle(cfg.legColor||0x333333);
+    g.fillRect(cx-7*s,cy+6*s,6*s,10*s);g.fillRect(cx+1*s,cy+6*s,6*s,10*s);
+    g.fillStyle(cfg.shoeColor||0x222222);
+    g.fillRect(cx-8*s,cy+14*s,8*s,4*s);g.fillRect(cx,cy+14*s,8*s,4*s);
+    g.fillStyle(cfg.bodyColor||0x556644);
+    g.fillRect(cx-9*s,cy-8*s,18*s,16*s);
+    g.fillStyle(cfg.beltColor||0x8B6914);
+    g.fillRect(cx-9*s,cy+2*s,18*s,3*s);
+    g.fillStyle(cfg.bodyColor||0x556644);
+    g.fillRect(cx-14*s,cy-8*s,6*s,12*s);g.fillRect(cx+8*s,cy-8*s,6*s,12*s);
+    g.fillStyle(cfg.skinColor||0xF4C080);
+    g.fillEllipse(cx-11*s,cy+5*s,8*s,8*s);g.fillEllipse(cx+11*s,cy+5*s,8*s,8*s);
+    g.fillRect(cx-3*s,cy-12*s,6*s,5*s);
+    g.fillStyle(cfg.skinColor||0xF4C080);
+    g.fillEllipse(cx,cy-18*s,18*s,18*s);
+    g.fillStyle(cfg.hairColor||0x3A2010);
+    g.fillRect(cx-9*s,cy-26*s,18*s,10*s);
     g.fillStyle(0x111111);
-    g.fillRect(cx - 5 * s, cy - 19 * s, 3 * s, 3 * s);
-    g.fillRect(cx + 2 * s, cy - 19 * s, 3 * s, 3 * s);
-    // Рот
-    g.fillRect(cx - 3 * s, cy - 13 * s, 6 * s, 2 * s);
-    // Дополнительные элементы
-    if (cfg.extra) cfg.extra(g, cx, cy, s);
+    g.fillRect(cx-5*s,cy-19*s,3*s,3*s);g.fillRect(cx+2*s,cy-19*s,3*s,3*s);
+    g.fillRect(cx-3*s,cy-13*s,6*s,2*s);
+    if(cfg.extra)cfg.extra(g,cx,cy,s);
   }
 
-  class MainScene extends Phaser.Scene {
-    constructor() { super('MainScene'); }
+  class MainScene extends Phaser.Scene{
+    constructor(){super('MainScene');}
 
-    create() {
-      this.dLines = [];
-      this.dIdx = 0;
-      this.dActive = false;
-      this.notifTimer = 0;
-      this.curScene = 'camp';
-      this.pPos = { x: W * 0.5, y: H * 0.5 };
+    create(){
+      this.dLines=[];this.dIdx=0;this.dActive=false;this.notifTimer=0;
+      this.curScene='camp';
+      this.pPos={x:W*0.5,y:H*0.5};
 
       this.buildGfxCache();
       this.buildCamp();
@@ -201,95 +181,455 @@
       this.updateHUD();
     }
 
-    buildGfxCache() {
-      const npcConfigs = {
-        liard: {
-          bodyColor: 0x8B1A1A, legColor: 0x2A2A2A, hairColor: 0x111111, skinColor: 0xD4934A,
-          beltColor: 0x6B3410, shoeColor: 0x111111,
-          extra: (g, cx, cy, s) => {
-            // Шрам на лице
-            g.lineStyle(2 * s, 0x8B3030);
-            g.strokeLineShape(new Phaser.Geom.Line(cx + 3 * s, cy - 20 * s, cx + 7 * s, cy - 14 * s));
-            // Боссовский плащ
+    buildGfxCache(){
+      this.npcConfigs={
+        liard:{bodyColor:0x8B1A1A,legColor:0x2A2A2A,hairColor:0x111111,skinColor:0xD4934A,
+          beltColor:0x6B3410,shoeColor:0x111111,
+          extra:(g,cx,cy,s)=>{
+            g.lineStyle(2*s,0x8B3030);
+            g.strokeLineShape(new Phaser.Geom.Line(cx+3*s,cy-20*s,cx+7*s,cy-14*s));
             g.fillStyle(0x4A0A0A);
-            g.fillTriangle(cx - 9 * s, cy - 8 * s, cx + 9 * s, cy - 8 * s, cx - 14 * s, cy + 10 * s);
-            g.fillTriangle(cx - 9 * s, cy - 8 * s, cx + 9 * s, cy - 8 * s, cx + 14 * s, cy + 10 * s);
-          }
-        },
-        korin: {
-          bodyColor: 0x6B4A1A, legColor: 0x3A2A10, hairColor: 0x888880, skinColor: 0xC8844A,
-          beltColor: 0x5A3A10, shoeColor: 0x2A1A08,
-          extra: (g, cx, cy, s) => {
-            // Кирка
-            g.lineStyle(3 * s, 0x8B6914);
-            g.strokeLineShape(new Phaser.Geom.Line(cx + 8 * s, cy - 5 * s, cx + 20 * s, cy - 15 * s));
+            g.fillTriangle(cx-9*s,cy-8*s,cx+9*s,cy-8*s,cx-14*s,cy+10*s);
+            g.fillTriangle(cx-9*s,cy-8*s,cx+9*s,cy-8*s,cx+14*s,cy+10*s);
+          }},
+        korin:{bodyColor:0x6B4A1A,legColor:0x3A2A10,hairColor:0x888880,skinColor:0xC8844A,
+          beltColor:0x5A3A10,shoeColor:0x2A1A08,
+          extra:(g,cx,cy,s)=>{
+            g.lineStyle(3*s,0x8B6914);
+            g.strokeLineShape(new Phaser.Geom.Line(cx+8*s,cy-5*s,cx+20*s,cy-15*s));
             g.fillStyle(0x909090);
-            g.fillRect(cx + 16 * s, cy - 20 * s, 8 * s, 5 * s);
-            // Каска
+            g.fillRect(cx+16*s,cy-20*s,8*s,5*s);
             g.fillStyle(0xC87820);
-            g.fillEllipse(cx, cy - 24 * s, 20 * s, 10 * s);
-            g.fillRect(cx - 10 * s, cy - 28 * s, 20 * s, 6 * s);
-            // Борода
+            g.fillEllipse(cx,cy-24*s,20*s,10*s);
+            g.fillRect(cx-10*s,cy-28*s,20*s,6*s);
             g.fillStyle(0x888880);
-            g.fillEllipse(cx, cy - 11 * s, 12 * s, 7 * s);
-          }
-        },
-        ela: {
-          bodyColor: 0x5A2870, legColor: 0x3A1850, hairColor: 0x1A0A30, skinColor: 0xF0A868,
-          beltColor: 0x9A5A10, shoeColor: 0x2A0A3A,
-          extra: (g, cx, cy, s) => {
-            // Колпак ведьмы
+            g.fillEllipse(cx,cy-11*s,12*s,7*s);
+          }},
+        ela:{bodyColor:0x5A2870,legColor:0x3A1850,hairColor:0x1A0A30,skinColor:0xF0A868,
+          beltColor:0x9A5A10,shoeColor:0x2A0A3A,
+          extra:(g,cx,cy,s)=>{
             g.fillStyle(0x3A1050);
-            g.fillTriangle(cx, cy - 38 * s, cx - 10 * s, cy - 24 * s, cx + 10 * s, cy - 24 * s);
+            g.fillTriangle(cx,cy-38*s,cx-10*s,cy-24*s,cx+10*s,cy-24*s);
             g.fillStyle(0x5A1878);
-            g.fillEllipse(cx, cy - 22 * s, 22 * s, 8 * s);
-            // Сумка
+            g.fillEllipse(cx,cy-22*s,22*s,8*s);
             g.fillStyle(0x8B6914);
-            g.fillEllipse(cx + 14 * s, cy, 10 * s, 12 * s);
-            g.fillRect(cx + 10 * s, cy - 6 * s, 2 * s, 6 * s);
-            // Длинные волосы
+            g.fillEllipse(cx+14*s,cy,10*s,12*s);
+            g.fillRect(cx+10*s,cy-6*s,2*s,6*s);
             g.fillStyle(0x1A0A30);
-            g.fillRect(cx - 9 * s, cy - 24 * s, 4 * s, 16 * s);
-            g.fillRect(cx + 5 * s, cy - 24 * s, 4 * s, 16 * s);
-          }
-        },
-        ran: {
-          bodyColor: 0x2A4A7A, legColor: 0x1A3050, hairColor: 0x8B6914, skinColor: 0xE8A060,
-          beltColor: 0xC89020, shoeColor: 0x1A2A3A,
-          extra: (g, cx, cy, s) => {
-            // Шлем
+            g.fillRect(cx-9*s,cy-24*s,4*s,16*s);
+            g.fillRect(cx+5*s,cy-24*s,4*s,16*s);
+          }},
+        ran:{bodyColor:0x2A4A7A,legColor:0x1A3050,hairColor:0x8B6914,skinColor:0xE8A060,
+          beltColor:0xC89020,shoeColor:0x1A2A3A,
+          extra:(g,cx,cy,s)=>{
             g.fillStyle(0x5A7090);
-            g.fillEllipse(cx, cy - 22 * s, 22 * s, 14 * s);
+            g.fillEllipse(cx,cy-22*s,22*s,14*s);
             g.fillStyle(0x4A6080);
-            g.fillRect(cx - 3 * s, cy - 22 * s, 6 * s, 10 * s);
-            // Щит
+            g.fillRect(cx-3*s,cy-22*s,6*s,10*s);
             g.fillStyle(0x4A6080);
-            g.fillRoundedRect(cx - 18 * s, cy - 6 * s, 10 * s, 14 * s, 2 * s);
-            g.lineStyle(2 * s, 0x8B9AA0);
-            g.strokeRoundedRect(cx - 18 * s, cy - 6 * s, 10 * s, 14 * s, 2 * s);
-            // Копьё
-            g.lineStyle(3 * s, 0x8B6914);
-            g.strokeLineShape(new Phaser.Geom.Line(cx + 12 * s, cy + 14 * s, cx + 8 * s, cy - 32 * s));
+            g.fillRoundedRect(cx-18*s,cy-6*s,10*s,14*s,2*s);
+            g.lineStyle(2*s,0x8B9AA0);
+            g.strokeRoundedRect(cx-18*s,cy-6*s,10*s,14*s,2*s);
+            g.lineStyle(3*s,0x8B6914);
+            g.strokeLineShape(new Phaser.Geom.Line(cx+12*s,cy+14*s,cx+8*s,cy-32*s));
             g.fillStyle(0xC0C0C0);
-            g.fillTriangle(cx + 8 * s, cy - 32 * s, cx + 5 * s, cy - 24 * s, cx + 11 * s, cy - 24 * s);
-          }
-        }
+            g.fillTriangle(cx+8*s,cy-32*s,cx+5*s,cy-24*s,cx+11*s,cy-24*s);
+          }}
       };
-      this.npcConfigs = npcConfigs;
-      // Игрок
-      this.playerCfg = {
-        bodyColor: 0x4A5A3A, legColor: 0x2A3020, hairColor: 0x4A2A10, skinColor: 0xE8984A,
-        beltColor: 0x6A4A10, shoeColor: 0x1A1008,
-        extra: (g, cx, cy, s) => {
-          // Метка заключённого
+      this.playerCfg={
+        bodyColor:0x4A5A3A,legColor:0x2A3020,hairColor:0x4A2A10,skinColor:0xE8984A,
+        beltColor:0x6A4A10,shoeColor:0x1A1008,
+        extra:(g,cx,cy,s)=>{
           g.fillStyle(0xDCB432);
-          g.fillRect(cx - 4 * s, cy - 6 * s, 8 * s, 3 * s);
+          g.fillRect(cx-4*s,cy-6*s,8*s,3*s);
         }
       };
     }
 
-    // Остальной код (buildCamp, buildMine, etc.) остаётся тем же
-    // ... (весь код из предыдущей версии)
+    buildCamp(){
+      this.cGrp=this.add.group();
+      const bg=this.add.graphics();
+      bg.fillStyle(0x1E4A1E);bg.fillRect(0,0,W,H);
+      for(let i=0;i<30;i++){
+        const gx=Math.random()*W,gy=Math.random()*H;
+        bg.fillStyle(0x2A6028,0.5);bg.fillEllipse(gx,gy,20,10);
+      }
+      bg.fillStyle(0x8B7040);
+      bg.fillRect(W*0.18,H*0.27,W*0.64,16);
+      bg.fillRect(W*0.46,H*0.2,16,H*0.6);
+      this.cGrp.add(bg);
+
+      const bld=this.add.graphics();
+      bld.fillStyle(0x5A3818);bld.fillRect(W*0.08,H*0.12,W*0.17,H*0.11);
+      bld.fillStyle(0x4A2810);bld.fillRect(W*0.08,H*0.12,W*0.17,8);
+      bld.lineStyle(3,0x3A1A08);bld.strokeRect(W*0.08,H*0.12,W*0.17,H*0.11);
+      bld.fillStyle(0x2A1808);bld.fillRect(W*0.14,H*0.2,W*0.05,H*0.03);
+
+      bld.fillStyle(0x5A3818);bld.fillRect(W*0.56,H*0.12,W*0.15,H*0.12);
+      bld.fillStyle(0x4A2810);bld.fillRect(W*0.56,H*0.12,W*0.15,8);
+      bld.lineStyle(3,0x3A1A08);bld.strokeRect(W*0.56,H*0.12,W*0.15,H*0.12);
+      bld.fillStyle(0x2A1808);bld.fillRect(W*0.62,H*0.21,W*0.03,H*0.03);
+
+      bld.fillStyle(0x4A3010);bld.fillRect(W*0.36,H*0.66,W*0.11,H*0.1);
+      bld.lineStyle(2,0x3A1A08);bld.strokeRect(W*0.36,H*0.66,W*0.11,H*0.1);
+
+      bld.fillStyle(0x5A4020);bld.fillEllipse(W*0.72,H*0.6,36,18);
+      bld.fillStyle(0x3A2810);bld.fillEllipse(W*0.72,H*0.6,24,12);
+      bld.fillStyle(0x2A64A0);bld.fillEllipse(W*0.72,H*0.6,16,8);
+      bld.lineStyle(3,0x5A4020);
+      bld.strokeLineShape(new Phaser.Geom.Line(W*0.72-18,H*0.6-9,W*0.72-18,H*0.6-26));
+      bld.strokeLineShape(new Phaser.Geom.Line(W*0.72+18,H*0.6-9,W*0.72+18,H*0.6-26));
+      bld.strokeLineShape(new Phaser.Geom.Line(W*0.72-18,H*0.6-26,W*0.72+18,H*0.6-26));
+      this.cGrp.add(bld);
+
+      const fire=this.add.graphics();
+      fire.fillStyle(0x303030);fire.fillEllipse(W*0.5,H*0.52,30,14);
+      fire.fillStyle(0xC87828,0.8);fire.fillEllipse(W*0.5,H*0.52,18,22);
+      fire.fillStyle(0xE08020);fire.fillEllipse(W*0.5,H*0.51,12,16);
+      fire.fillStyle(0xF0C020);fire.fillEllipse(W*0.5,H*0.5,7,10);
+      fire.fillStyle(0xFFFF80,0.7);fire.fillEllipse(W*0.5,H*0.495,4,6);
+      fire.fillStyle(0x4A2810);fire.fillRect(W*0.49-16,H*0.53,32,6);
+      fire.fillRect(W*0.5-4,H*0.52,8,10);
+      this.cGrp.add(fire);
+
+      const barr=this.add.graphics();
+      for(let x=0;x<W;x+=26){
+        barr.lineStyle(2,0x0060C0,0.7);
+        barr.strokeLineShape(new Phaser.Geom.Line(x,0,x+13,22));
+      }
+      this.cGrp.add(barr);
+
+      const mineEnt=this.add.graphics();
+      mineEnt.fillStyle(0x0A0806);mineEnt.fillRoundedRect(W*0.42,H*0.79,W*0.16,H*0.06,4);
+      mineEnt.lineStyle(3,0x706050);mineEnt.strokeRoundedRect(W*0.42,H*0.79,W*0.16,H*0.06,4);
+      mineEnt.lineStyle(4,0x5A3818);
+      mineEnt.strokeLineShape(new Phaser.Geom.Line(W*0.42,H*0.79,W*0.42,H*0.85));
+      mineEnt.strokeLineShape(new Phaser.Geom.Line(W*0.58,H*0.79,W*0.58,H*0.85));
+      mineEnt.strokeLineShape(new Phaser.Geom.Line(W*0.42,H*0.79,W*0.58,H*0.79));
+      this.cGrp.add(mineEnt);
+
+      const lblSt={fontSize:'12px',color:'#C8B090',fontFamily:'Arial'};
+      const smlSt={fontSize:'10px',color:'#907860',fontFamily:'Arial'};
+      this.cGrp.add(this.add.text(W*0.165,H*0.175,'🏚 Бараки',lblSt).setOrigin(0.5));
+      this.cGrp.add(this.add.text(W*0.635,H*0.18,'📦 Склад',lblSt).setOrigin(0.5));
+      this.cGrp.add(this.add.text(W*0.415,H*0.715,'🪵 Хибара',smlSt).setOrigin(0.5));
+      this.cGrp.add(this.add.text(W*0.72,H*0.65,'🪣 Колодец',smlSt).setOrigin(0.5));
+      this.cGrp.add(this.add.text(W*0.5,H*0.565,'🔥 Костёр',{fontSize:'11px',color:'#C87828',fontFamily:'Arial'}).setOrigin(0.5));
+      this.cGrp.add(this.add.text(W*0.5,3,'~ ~ ~ МАГИЧЕСКИЙ БАРЬЕР ~ ~ ~',{fontSize:'12px',color:'#4080FF',fontFamily:'Arial'}).setOrigin(0.5,0));
+      this.cGrp.add(this.add.text(W*0.5,H*0.81,'⛏ ШАХТА',{fontSize:'13px',color:'#D0B888',fontFamily:'Arial'}).setOrigin(0.5));
+
+      this.npcDefs={
+        liard:{x:W*0.24,y:H*0.36,name:'ЛИАРД',nc:'#FF6464',icon:'👹'},
+        korin:{x:W*0.42,y:H*0.31,name:'КОРИН',nc:'#FFB464',icon:'⛏'},
+        ela:{x:W*0.66,y:H*0.44,name:'ЭЛА',nc:'#C896FF',icon:'🧙'},
+        ran:{x:W*0.73,y:H*0.31,name:'РАН',nc:'#6496FF',icon:'💂'}
+      };
+
+      const npcGfx=this.add.graphics();
+      Object.entries(this.npcDefs).forEach(([k,d])=>{
+        drawChar(npcGfx,d.x,d.y,this.npcConfigs[k]);
+        this.cGrp.add(this.add.text(d.x,d.y-38,d.name,
+          {fontSize:'11px',color:d.nc,fontFamily:'Arial',fontStyle:'bold'}).setOrigin(0.5));
+      });
+      this.cGrp.add(npcGfx);
+
+      this.ePrompt=this.add.text(0,0,'',
+        {fontSize:'12px',color:'#DCB432',fontFamily:'Arial',
+         backgroundColor:'#1E140A99',padding:{x:4,y:2}})
+        .setOrigin(0.5).setVisible(false).setDepth(4);
+
+      this.mineEntrPos={x:W*0.5,y:H*0.82};
+    }
+
+    buildMine(){
+      this.mGrp=this.add.group();
+      const g=this.add.graphics();
+      g.fillStyle(0x080504);g.fillRect(0,0,W,H);
+      for(let i=0;i<40;i++){
+        const rx=Math.random()*W,ry=Math.random()*H;
+        g.fillStyle(0x1A1208,0.6);
+        g.fillEllipse(rx,ry,Math.random()*30+10,Math.random()*20+8);
+      }
+      g.fillStyle(0x100C08);g.fillRoundedRect(50,50,W-100,H-100,20);
+      g.lineStyle(6,0x3A2A18);g.strokeRoundedRect(50,50,W-100,H-100,20);
+
+      g.lineStyle(6,0x5A3818);
+      [W*0.25,W*0.5,W*0.75].forEach(bx=>{
+        g.strokeLineShape(new Phaser.Geom.Line(bx-30,H*0.2,bx-30,H*0.8));
+        g.strokeLineShape(new Phaser.Geom.Line(bx+30,H*0.2,bx+30,H*0.8));
+        g.strokeLineShape(new Phaser.Geom.Line(bx-30,H*0.25,bx+30,H*0.25));
+        g.strokeLineShape(new Phaser.Geom.Line(bx-30,H*0.5,bx+30,H*0.5));
+      });
+
+      g.lineStyle(5,0x3A1A08);
+      g.strokeLineShape(new Phaser.Geom.Line(W*0.32,H*0.35,W*0.44,H*0.45));
+      g.strokeLineShape(new Phaser.Geom.Line(W*0.44,H*0.35,W*0.32,H*0.45));
+
+      g.fillStyle(0x040302);g.fillRect(50,H*0.65,W*0.18,H*0.31);
+      g.fillRect(W*0.78,50,W*0.18,H*0.22);
+
+      [[W*0.2,H*0.28],[W*0.65,H*0.42],[W*0.42,H*0.7]].forEach(([tx,ty])=>{
+        g.fillStyle(0x3C2808,0.4);g.fillCircle(tx,ty,60);
+        g.fillStyle(0xC87828,0.8);g.fillCircle(tx,ty,16);
+        g.fillStyle(0xF0A020);g.fillCircle(tx,ty,10);
+        g.fillStyle(0xFFE040);g.fillCircle(tx,ty,5);
+        g.fillStyle(0x5A3818);g.fillRect(tx-3,ty+12,6,16);
+      });
+
+      g.fillStyle(0xD0C8A0,0.7);
+      g.fillEllipse(W*0.6,H*0.65,18,8);
+      g.fillEllipse(W*0.62,H*0.67,8,4);
+      g.fillEllipse(W*0.58,H*0.67,8,4);
+
+      g.lineStyle(2,0x2A1A0A);
+      g.strokeLineShape(new Phaser.Geom.Line(W*0.15,H*0.3,W*0.22,H*0.45));
+      g.strokeLineShape(new Phaser.Geom.Line(W*0.22,H*0.45,W*0.18,H*0.55));
+      g.strokeLineShape(new Phaser.Geom.Line(W*0.8,H*0.6,W*0.88,H*0.7));
+      this.mGrp.add(g);
+
+      this.oreG=this.add.graphics();
+      this.oreG.fillStyle(0x5A3818);this.oreG.fillRect(W*0.35,H*0.49,26,20);
+      this.oreG.lineStyle(2,0x8B6914);this.oreG.strokeRect(W*0.35,H*0.49,26,20);
+      this.oreG.fillStyle(0x64C8FF,0.8);this.oreG.fillCircle(W*0.363,H*0.5+5,6);
+      this.oreG.fillStyle(0xAAE4FF);this.oreG.fillCircle(W*0.363,H*0.5+5,3);
+      this.mGrp.add(this.oreG);
+      this.oreLbl=this.add.text(W*0.363,H*0.49-14,'✨ Странная руда',
+        {fontSize:'10px',color:'#96DCFF',fontFamily:'Arial'}).setOrigin(0.5);
+      this.mGrp.add(this.oreLbl);
+      this.orePos={x:W*0.363,y:H*0.5+5};
+
+      this.amuG=this.add.graphics();
+      this.amuG.fillStyle(0xD29632,0.9);this.amuG.fillCircle(W*0.62,H*0.58,15);
+      this.amuG.lineStyle(2,0xFFD050);this.amuG.strokeCircle(W*0.62,H*0.58,15);
+      this.amuG.fillStyle(0xFFE080);this.amuG.fillCircle(W*0.62,H*0.58,6);
+      this.amuG.lineStyle(2,0xD29632);
+      this.amuG.strokeLineShape(new Phaser.Geom.Line(W*0.62,H*0.58-15,W*0.62,H*0.58-25));
+      this.mGrp.add(this.amuG);
+      this.amuLbl=this.add.text(W*0.62,H*0.58-30,'🥉 Амулет шахтёра',
+        {fontSize:'10px',color:'#FFD050',fontFamily:'Arial'}).setOrigin(0.5);
+      this.mGrp.add(this.amuLbl);
+      this.amuPos={x:W*0.62,y:H*0.58};
+
+      const exitG=this.add.graphics();
+      exitG.fillStyle(0x1A1008);exitG.fillRoundedRect(W*0.42,H*0.12,W*0.16,H*0.06,4);
+      exitG.lineStyle(3,0x706050);exitG.strokeRoundedRect(W*0.42,H*0.12,W*0.16,H*0.06,4);
+      exitG.lineStyle(4,0x5A3818);
+      exitG.strokeLineShape(new Phaser.Geom.Line(W*0.42,H*0.12,W*0.42,H*0.18));
+      exitG.strokeLineShape(new Phaser.Geom.Line(W*0.58,H*0.12,W*0.58,H*0.18));
+      this.mGrp.add(exitG);
+      this.mGrp.add(this.add.text(W*0.5,H*0.15,'▲ Выход из шахты',
+        {fontSize:'12px',color:'#D0B888',fontFamily:'Arial'}).setOrigin(0.5));
+      this.mineExitPos={x:W*0.5,y:H*0.15};
+
+      this.mGrp.add(this.add.text(W*0.5,H-28,'…шёпот…  …не ходи дальше…  …уходи…',
+        {fontSize:'11px',color:'#503060',fontFamily:'Arial'}).setOrigin(0.5));
+    }
+
+    buildPlayer(){
+      this.pGfx=this.add.graphics().setDepth(3);
+      this.pPos={x:W*0.5,y:H*0.5};
+      this.drawPlayer();
+      this.pLbl=this.add.text(this.pPos.x,this.pPos.y-42,'ТЫ',
+        {fontSize:'11px',color:'#DCB432',fontFamily:'Arial',fontStyle:'bold'})
+        .setOrigin(0.5).setDepth(4);
+    }
+    drawPlayer(){
+      this.pGfx.clear();
+      drawChar(this.pGfx,this.pPos.x,this.pPos.y,this.playerCfg);
+    }
+
+    buildDlgPanel(){
+      const pH=165;
+      this.dlgBg=this.add.graphics().setDepth(10);
+      this.dlgBg.fillStyle(0x120C06,0.97);
+      this.dlgBg.fillRoundedRect(12,H-pH-8,W-24,pH,10);
+      this.dlgBg.lineStyle(2,0x785030);
+      this.dlgBg.strokeRoundedRect(12,H-pH-8,W-24,pH,10);
+      this.dlgBg.setVisible(false);
+      this.dlgSpk=this.add.text(26,H-pH+4,'',
+        {fontSize:'16px',color:'#FF6464',fontStyle:'bold',fontFamily:'Arial'}).setDepth(11);
+      this.dlgTxt=this.add.text(26,H-pH+30,'',
+        {fontSize:'13px',color:'#DCC896',fontFamily:'Arial',wordWrap:{width:W-52}}).setDepth(11);
+      this.dlgHint=this.add.text(W-20,H-12,'[ Тап / Enter — далее ]',
+        {fontSize:'10px',color:'#604830',fontFamily:'Arial'}).setOrigin(1,1).setDepth(11).setVisible(false);
+      this.input.on('pointerdown',()=>{if(this.dActive)this.advDlg();});
+    }
+
+    buildHUD(){
+      this.hudT=[];
+      for(let i=0;i<7;i++)
+        this.hudT.push(this.add.text(8,8+i*17,'',
+          {fontSize:'11px',color:'#DCC896',fontFamily:'Arial'}).setDepth(5));
+      this.scnLbl=this.add.text(W-8,8,'',
+        {fontSize:'11px',color:'#C8A870',fontFamily:'Arial'}).setOrigin(1,0).setDepth(5);
+      this.ntfTxt=this.add.text(W*0.5,H*0.28,'',
+        {fontSize:'13px',color:'#DCB432',fontFamily:'Arial',
+         backgroundColor:'#120C06CC',padding:{x:12,y:7}})
+         .setOrigin(0.5).setDepth(12).setVisible(false);
+    }
+
+    buildMobileCtrl(){
+      const s={fontSize:'22px',color:'#DCB432',fontFamily:'Arial',
+               backgroundColor:'#12090699',padding:{x:9,y:7}};
+      const bx=60,by=H-115;
+      this.btnU=this.add.text(bx,by-52,'▲',s).setOrigin(0.5).setDepth(20).setInteractive();
+      this.btnD=this.add.text(bx,by+8,'▼',s).setOrigin(0.5).setDepth(20).setInteractive();
+      this.btnL=this.add.text(bx-52,by-22,'◄',s).setOrigin(0.5).setDepth(20).setInteractive();
+      this.btnR=this.add.text(bx+52,by-22,'►',s).setOrigin(0.5).setDepth(20).setInteractive();
+      this.btnAct=this.add.text(W-48,by-18,'💬',
+        {fontSize:'30px',color:'#DCB432',fontFamily:'Arial',
+         backgroundColor:'#12090699',padding:{x:9,y:6}})
+         .setOrigin(0.5).setDepth(20).setInteractive();
+      this.mv={u:false,d:false,l:false,r:false};
+      [[this.btnU,'u'],[this.btnD,'d'],[this.btnL,'l'],[this.btnR,'r']]
+        .forEach(([b,k])=>{
+          b.on('pointerdown',()=>{this.mv[k]=true;});
+          b.on('pointerup',()=>{this.mv[k]=false;});
+          b.on('pointerout',()=>{this.mv[k]=false;});
+        });
+      this.btnAct.on('pointerdown',()=>this.interact());
+    }
+
+    buildKeys(){
+      this.cursors=this.input.keyboard.createCursorKeys();
+      this.wasd=this.input.keyboard.addKeys({u:'W',d:'S',l:'A',r:'D'});
+      this.keyE=this.input.keyboard.addKey('E');
+      this.keySP=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+      this.keyEN=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    }
+
+    showScene(name){
+      this.curScene=name;
+      this.cGrp.setVisible(name==='camp');
+      this.mGrp.setVisible(name==='mine');
+      if(name==='camp')this.pPos={x:W*0.5,y:H*0.5};
+      else this.pPos={x:W*0.5,y:H*0.28};
+      this.drawPlayer();
+      this.pLbl.setPosition(this.pPos.x,this.pPos.y-42);
+      this.updateHUD();
+    }
+
+    notify(msg){
+      this.ntfTxt.setText(msg).setVisible(true);
+      this.notifTimer=200;
+    }
+
+    startDlg(npc){
+      const l=getDialogue(npc);if(!l||!l.length)return;
+      this.dLines=l;this.dIdx=0;this.dActive=true;this.showLine();
+    }
+    showLine(){
+      if(this.dIdx>=this.dLines.length){this.endDlg();return;}
+      const[sp,tx]=this.dLines[this.dIdx];
+      const nc={
+        'ЛИАРД':'#FF6464','КОРИН':'#FFB464','ЭЛА':'#C896FF','РАН':'#6496FF',
+        'ГЕРОЙ':'#96DC96','★ ЗАДАНИЕ':'#DCB432','★ ПОЛУЧЕНО':'#DCB432',
+        '★ ПОДЗАДАЧА':'#DCB432'};
+      const icons={'ЛИАРД':'👹 ','КОРИН':'⛏ ','ЭЛА':'🧙 ','РАН':'💂 ','ГЕРОЙ':'🧑 '};
+      this.dlgSpk.setText((icons[sp]||'')+sp+':').setColor(nc[sp]||'#FFFFFF');
+      this.dlgTxt.setText(tx);
+      this.dlgBg.setVisible(true);this.dlgHint.setVisible(true);
+      this.updateHUD();
+    }
+    advDlg(){if(!this.dActive)return;this.dIdx++;if(this.dIdx>=this.dLines.length)this.endDlg();else this.showLine();}
+    endDlg(){this.dActive=false;this.dLines=[];this.dlgBg.setVisible(false);this.dlgHint.setVisible(false);this.dlgSpk.setText('');this.dlgTxt.setText('');this.updateHUD();}
+
+    dist(x1,y1,x2,y2){return Math.abs(x1-x2)+Math.abs(y1-y2);}
+
+    interact(){
+      if(this.dActive){this.advDlg();return;}
+      const px=this.pPos.x,py=this.pPos.y;
+      if(this.curScene==='camp'){
+        for(const[k,d]of Object.entries(this.npcDefs)){
+          if(this.dist(px,py,d.x,d.y)<72){this.startDlg(k);return;}
+        }
+        if(this.dist(px,py,this.mineEntrPos.x,this.mineEntrPos.y)<72){
+          if(gs.questStage>=1)this.showScene('mine');
+          else this.notify('Сначала поговори с Лиардом!');
+        }
+      }else{
+        if(!gs.hasOre&&this.dist(px,py,this.orePos.x,this.orePos.y)<62){
+          gs.hasOre=true;gs.items.push('✨ Странная руда');
+          this.oreG.setVisible(false);this.oreLbl.setVisible(false);
+          this.notify('✨ Ты подобрал Странную руду!');
+        }
+        if(!gs.hasAmulet&&this.dist(px,py,this.amuPos.x,this.amuPos.y)<62){
+          gs.hasAmulet=true;gs.items.push('🥉 Амулет шахтёра');
+          this.amuG.setVisible(false);this.amuLbl.setVisible(false);
+          this.notify('🥉 Ты нашёл Амулет шахтёра!');
+        }
+        if(this.dist(px,py,this.mineExitPos.x,this.mineExitPos.y)<72){
+          this.showScene('camp');
+          this.pPos={x:W*0.5,y:H*0.74};
+          this.drawPlayer();this.pLbl.setPosition(this.pPos.x,this.pPos.y-42);
+          if(gs.hasOre&&gs.questStage===1){
+            gs.questStage=2;this.notify('Вернись и отчитайся перед Лиардом!');
+          }
+        }
+      }
+      this.updateHUD();
+    }
+
+    updateHUD(){
+      let lines=[];
+      if(gs.questStage===0)lines=['Нет активных заданий'];
+      else if(gs.questStage===1){
+        lines=['[ЗАДАНИЕ] Шёпот из шахты:'];
+        if(!gs.talkedKorin)lines.push('  • Поговори с Корином');
+        if(!gs.hasOre)lines.push('  • Найди руду в шахте');
+        if(!gs.hasAmulet)lines.push('  • (необяз.) Найди амулет');
+      }else if(gs.questStage===2){
+        lines=['[ЗАДАНИЕ] Вернись в лагерь:'];
+        if(!gs.returnedLiard)lines.push('  • Отчитайся перед Лиардом');
+        if(gs.hasAmulet&&!gs.returnedKorin)lines.push('  • Отдай амулет Корину');
+      }else lines=['✓ Квест «Шёпот из шахты» завершён!'];
+      if(gs.items.length)lines.push('🎒 '+gs.items.join('  '));
+      this.hudT.forEach((t,i)=>{
+        if(i<lines.length){
+          const c=(lines[i].includes('[ЗАДАНИЕ]')||lines[i].includes('✓'))?'#DCB432':'#C8A870';
+          t.setText(lines[i]).setColor(c).setVisible(true);
+        }else t.setVisible(false);
+      });
+      this.scnLbl.setText('📍 '+(this.curScene==='camp'?'Лагерь Угольной Ямы':'Шахта'));
+    }
+
+    update(){
+      if(this.notifTimer>0){
+        this.notifTimer--;
+        if(this.notifTimer===0)this.ntfTxt.setVisible(false);
+      }
+      if(this.dActive)return;
+      const spd=2.8,k=this.wasd,c=this.cursors,m=this.mv;
+      let dx=0,dy=0;
+      if(k.l.isDown||c.left.isDown||m.l)dx-=spd;
+      if(k.r.isDown||c.right.isDown||m.r)dx+=spd;
+      if(k.u.isDown||c.up.isDown||m.u)dy-=spd;
+      if(k.d.isDown||c.down.isDown||m.d)dy+=spd;
+      this.pPos.x=Phaser.Math.Clamp(this.pPos.x+dx,22,W-22);
+      this.pPos.y=Phaser.Math.Clamp(this.pPos.y+dy,30,H-62);
+      this.drawPlayer();
+      this.pLbl.setPosition(this.pPos.x,this.pPos.y-42);
+      if(Phaser.Input.Keyboard.JustDown(this.keyE)||
+         Phaser.Input.Keyboard.JustDown(this.keySP)||
+         Phaser.Input.Keyboard.JustDown(this.keyEN))this.interact();
+      const px=this.pPos.x,py=this.pPos.y;
+      if(this.curScene==='camp'){
+        let found=false;
+        for(const d of Object.values(this.npcDefs)){
+          if(this.dist(px,py,d.x,d.y)<72){
+            this.ePrompt.setPosition(d.x,d.y-52)
+              .setText('[E] '+d.icon+' говорить').setVisible(true);
+            found=true;break;
+          }
+        }
+        if(!found&&this.dist(px,py,this.mineEntrPos.x,this.mineEntrPos.y)<72){
+          this.ePrompt.setPosition(W*0.5,H*0.76)
+            .setText('[E] ⛏ Войти в шахту').setVisible(true);
+          found=true;
+        }
+        if(!found)this.ePrompt.setVisible(false);
+      }else this.ePrompt.setVisible(false);
+    }
   }
 
   new Phaser.Game({
